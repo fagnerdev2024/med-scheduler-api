@@ -1,5 +1,6 @@
 package med.voll.api.controller;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import med.voll.api.dtos.*;
@@ -7,6 +8,7 @@ import med.voll.api.repositories.PacienteRepository;
 import med.voll.api.services.PacienteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -40,8 +42,9 @@ public class PacienteController {
     }
 
     @GetMapping
-    public ResponseEntity<?> listarPaciente(@PageableDefault(page = 0, size = 10, sort = {"nome"}) Pageable paginacao) {
+    public ResponseEntity<?> listarPaciente(@Parameter(hidden = true) @ParameterObject @PageableDefault(page = 0, size = 10, sort = "nome") Pageable paginacao) {
         log.info("Recebida solicitação para listar pacientes com paginação: {}", paginacao);
+
         Page<DadosListagemPaciente> dadosListagemPacientes = pacienteService.listar(paginacao);
 
         if (dadosListagemPacientes.isEmpty()) {
@@ -49,6 +52,7 @@ public class PacienteController {
             response.put("message", "Nenhum paciente ativo encontrado");
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
+
         return ResponseEntity.ok(dadosListagemPacientes);
     }
 
