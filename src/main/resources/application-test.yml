@@ -1,6 +1,6 @@
 spring:
   application:
-    name: api
+    name: med-scheduler-api
 
   datasource:
     url: jdbc:mysql://localhost:3306/vollmed_api_test

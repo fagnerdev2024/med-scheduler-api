@@ -6,10 +6,10 @@ spring:
     locations: classpath:db/migration-postgresql
 
   jpa:
-    show-sql: false
+    show-sql: true
     properties:
       hibernate:
-        format_sql: false
+        format_sql: true
 
 api:
   security:
