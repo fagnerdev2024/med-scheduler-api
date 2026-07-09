@@ -1,6 +1,6 @@
 spring:
   application:
-    name: api
+    name: med-scheduler-api
 
   datasource:
     url: ${DATASOURCE_URL}
