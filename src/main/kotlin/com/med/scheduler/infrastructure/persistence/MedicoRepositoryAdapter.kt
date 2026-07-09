@@ -24,6 +24,10 @@ class MedicoRepositoryAdapter(
         return jpaRepository.findAllByAtivoTrue(paginacao)
     }
 
+    override fun findAtivoById(id: Long): Boolean? {
+        return jpaRepository.findAtivoById(id)
+    }
+
     override fun escolherMedicoAleatorioLivreNaData(especialidade: Especialidade, data: LocalDateTime): Medico? {
         return jpaRepository.escolherMedicoAleatorioLivreNaData(especialidade, data)
     }

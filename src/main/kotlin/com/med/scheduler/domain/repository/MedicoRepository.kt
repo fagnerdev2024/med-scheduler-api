@@ -10,6 +10,7 @@ interface MedicoRepository {
     fun save(medico: Medico): Medico
     fun findById(id: Long): Medico?
     fun findAllByAtivoTrue(paginacao: Pageable): Page<Medico>
+    fun findAtivoById(id: Long): Boolean?
     fun escolherMedicoAleatorioLivreNaData(especialidade: Especialidade, data: LocalDateTime): Medico?
     fun delete(id: Long)
 }

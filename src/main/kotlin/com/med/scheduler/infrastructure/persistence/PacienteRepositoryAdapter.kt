@@ -18,12 +18,16 @@ class PacienteRepositoryAdapter(
         return jpaRepository.findById(id).orElse(null)
     }
 
-    override fun findAll(paginacao: Pageable): Page<Paciente> {
-        return jpaRepository.findAll(paginacao)
+    override fun findAllByAtivoTrue(paginacao: Pageable): Page<Paciente> {
+        return jpaRepository.findAllByAtivoTrue(paginacao)
     }
 
     override fun existsByEmail(email: String): Boolean {
         return jpaRepository.existsByEmail(email)
+    }
+
+    override fun findAtivoById(id: Long): Boolean? {
+        return jpaRepository.findAtivoById(id)
     }
 
     override fun delete(id: Long) {

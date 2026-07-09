@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull
 import java.time.LocalDateTime
 
 data class DadosAgendamentoConsulta(
-    @field:NotNull
     val idMedico: Long?,
 
     @field:NotNull
