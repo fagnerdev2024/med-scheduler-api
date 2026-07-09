@@ -8,7 +8,7 @@ spring:
     password: postgres
 
   flyway:
-    locations: classpath:db/migration-postgresql
+    locations: classpath:db/migration-postgresql,classpath:db/migration-local
 
   jpa:
     show-sql: true
