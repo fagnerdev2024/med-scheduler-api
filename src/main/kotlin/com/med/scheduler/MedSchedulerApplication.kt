@@ -1,11 +1,11 @@
-package med.voll.api
+package com.med.scheduler
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class ApiApplication
+class MedSchedulerApplication
 
 fun main(args: Array<String>) {
-	runApplication<ApiApplication>(*args)
+	runApplication<MedSchedulerApplication>(*args)
 }

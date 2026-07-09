@@ -1,1 +1,1 @@
-rootProject.name = "api-restful"
+rootProject.name = "med-scheduler-api"
