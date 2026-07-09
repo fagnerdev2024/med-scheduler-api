@@ -3,6 +3,7 @@ package com.med.scheduler.application.service
 import com.med.scheduler.application.dto.DadosAutenticacao
 import com.med.scheduler.application.dto.DadosTokenJWT
 import com.med.scheduler.domain.repository.UsuarioRepository
+import com.med.scheduler.infrastructure.security.TokenService
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.userdetails.UserDetails
