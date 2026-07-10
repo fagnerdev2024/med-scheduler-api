@@ -18,7 +18,7 @@ class TokenService(
 ) : TokenService {
 
     companion object {
-        private const val ISSUER = "API Voll.med"
+        private const val ISSUER = "API Med Scheduler"
     }
 
     override fun gerarToken(userDetails: UserDetails): String {
