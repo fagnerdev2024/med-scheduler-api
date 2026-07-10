@@ -24,15 +24,17 @@ jobs:
           set -e
           CURRENT_BRANCH="${GITHUB_REF#refs/heads/}"
 
+          VERSION=$(grep -oP 'version\s*=\s*"\K[^"]+' build.gradle.kts | sed 's/-SNAPSHOT//' || echo "0.0.0")
+
           if [ "$CURRENT_BRANCH" = "develop" ]; then
             TARGET_BRANCH="release"
             HEAD_BRANCH="develop"
-            TITLE="Promote develop to release"
+            TITLE="PR criado automaticamente. release/v${VERSION} <- develop"
             BODY="PR automático para promover alterações do ambiente dev para release (homologação)."
           elif [ "$CURRENT_BRANCH" = "release" ]; then
             TARGET_BRANCH="main"
             HEAD_BRANCH="release"
-            TITLE="Promote release to main"
+            TITLE="PR criado automaticamente. main <- release/v${VERSION}"
             BODY="PR automático para promover alterações de release (homologação) para main (produção)."
           else
             echo "Branch $CURRENT_BRANCH not handled for promotion."
