@@ -1,0 +1,53 @@
+name: Promote between environments
+
+on:
+  push:
+    branches:
+      - develop
+      - release
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  create-promotion-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create promotion PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          CURRENT_BRANCH="${GITHUB_REF#refs/heads/}"
+
+          if [ "$CURRENT_BRANCH" = "develop" ]; then
+            TARGET_BRANCH="release"
+            HEAD_BRANCH="develop"
+            TITLE="Promote develop to release"
+            BODY="PR automático para promover alterações do ambiente dev para release (homologação)."
+          elif [ "$CURRENT_BRANCH" = "release" ]; then
+            TARGET_BRANCH="main"
+            HEAD_BRANCH="release"
+            TITLE="Promote release to main"
+            BODY="PR automático para promover alterações de release (homologação) para main (produção)."
+          else
+            echo "Branch $CURRENT_BRANCH not handled for promotion."
+            exit 0
+          fi
+
+          EXISTING=$(gh pr list --base "$TARGET_BRANCH" --head "$HEAD_BRANCH" --json number --jq 'length')
+
+          if [ "$EXISTING" -gt 0 ]; then
+            echo "PR already exists from $HEAD_BRANCH to $TARGET_BRANCH. Skipping."
+            exit 0
+          fi
+
+          gh pr create \
+            --base "$TARGET_BRANCH" \
+            --head "$HEAD_BRANCH" \
+            --title "$TITLE" \
+            --body "$BODY"
