@@ -27,17 +27,17 @@ class SpringDocConfigurations {
             )
             .info(
                 Info()
-                    .title("Voll.med API")
-                    .description("API Rest da aplicação Voll.med, com CRUD de médicos e pacientes, agendamento e cancelamento de consultas.")
+                    .title("Med Scheduler API")
+                    .description("API Rest da aplicação Med Scheduler, com CRUD de médicos e pacientes, agendamento e cancelamento de consultas.")
                     .contact(
                         Contact()
                             .name("Time Backend")
-                            .email("backend@voll.med")
+                            .email("backend@medscheduler.dev")
                     )
                     .license(
                         License()
                             .name("Apache 2.0")
-                            .url("http://voll.med/api/licenca")
+                            .url("https://www.apache.org/licenses/LICENSE-2.0")
                     )
             )
     }
