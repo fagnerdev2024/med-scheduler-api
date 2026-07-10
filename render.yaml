@@ -2,7 +2,7 @@ services:
   - type: web
     runtime: docker
     name: med-scheduler-api-dev
-    branch: dev
+    branch: develop
     plan: starter
     dockerfilePath: ./Dockerfile
     healthCheckPath: /actuator/health
@@ -21,7 +21,7 @@ services:
   - type: web
     runtime: docker
     name: med-scheduler-api-homol
-    branch: homol
+    branch: release
     plan: starter
     dockerfilePath: ./Dockerfile
     healthCheckPath: /actuator/health
