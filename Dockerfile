@@ -1,8 +1,16 @@
+FROM gradle:8.11.1-jdk21 AS builder
+
+WORKDIR /home/gradle/app
+
+COPY --chown=gradle:gradle . .
+
+RUN ./gradlew bootJar --no-daemon
+
 FROM eclipse-temurin:21-jre
 
 WORKDIR /app
 
-COPY build/libs/*.jar app.jar
+COPY --from=builder /home/gradle/app/build/libs/*.jar app.jar
 
 EXPOSE 8080
 
