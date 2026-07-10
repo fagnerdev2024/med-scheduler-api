@@ -3,7 +3,7 @@ spring:
     name: med-scheduler-api
 
   flyway:
-    locations: classpath:db/migration-postgresql
+    locations: classpath:db/migration-postgresql,classpath:db/migration-dev
 
   jpa:
     show-sql: true
