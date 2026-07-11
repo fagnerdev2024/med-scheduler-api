@@ -31,5 +31,9 @@ out/
 ### VS Code ###
 .vscode/
 
+### Environment files ###
+.env
+.env.local-dev
+
 ### Kotlin ###
 .kotlin
