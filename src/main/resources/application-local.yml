@@ -16,11 +16,16 @@ spring:
       hibernate:
         format_sql: true
 
+  output:
+    ansi:
+      enabled: always
+
 api:
   security:
     token:
       secret: 123456
 
 server:
+  port: 8081
   error:
     include-stacktrace: never
