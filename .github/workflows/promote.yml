@@ -127,12 +127,17 @@ jobs:
             diff_count=$(git rev-list --count "origin/$release_branch..origin/develop" 2>/dev/null || echo 0)
             if [ "$diff_count" -eq 0 ]; then
               echo "No changes between develop and $release_branch. Skipping."
-              exit 0
+            else
+              create_pr "$release_branch" "develop" \
+                "PR criado automaticamente. $release_branch <- develop" \
+                "PR automático para promover alterações de develop para $release_branch (homologação)."
             fi
 
-            create_pr "$release_branch" "develop" \
-              "PR criado automaticamente. $release_branch <- develop" \
-              "PR automático para promover alterações de develop para $release_branch (homologação)."
+            # Also ensure the PR to main exists. Push events from the GITHUB_TOKEN do not
+            # trigger the release branch workflow, so we create the main PR here as well.
+            create_pr "main" "$release_branch" \
+              "PR criado automaticamente. main <- $release_branch" \
+              "PR automático para promover alterações de $release_branch para main (produção)."
             exit 0
           fi
 
