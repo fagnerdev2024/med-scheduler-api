@@ -53,7 +53,7 @@ A aplicação utiliza profiles do Spring Boot para separar os ambientes:
 |---------|--------|-------|-----------|
 | `local` | sua máquina | PostgreSQL via Docker | desenvolvimento local |
 | `dev` | `develop` | Neon (dev) | desenvolvimento na nuvem |
-| `homol` | `release` | Neon (homol) | homologação |
+| `homol` | `release/v0.0.0` | Neon (homol) | homologação |
 | `prod` | `main` | Neon (prod) | produção |
 
 ---
@@ -63,12 +63,12 @@ A aplicação utiliza profiles do Spring Boot para separar os ambientes:
 O repositório segue o fluxo Git Flow simplificado:
 
 ```
-feature/*  -> develop -> release -> main
+feature/*  -> develop -> release/v0.0.0 -> main
 ```
 
 1. Uma `feature/*` é aberta para `develop`.
-2. Ao mergear em `develop`, o GitHub Actions abre automaticamente um PR `develop` -> `release`.
-3. Ao mergear em `release`, o GitHub Actions abre automaticamente um PR `release` -> `main`.
+2. Ao mergear em `develop`, o GitHub Actions abre automaticamente um PR `develop` -> `release/v0.0.0`.
+3. Ao mergear em `release/v0.0.0`, o GitHub Actions abre automaticamente um PR `release/v0.0.0` -> `main`.
 
 Os serviços no Render fazem deploy a partir das branches correspondentes.
 
@@ -102,9 +102,9 @@ docker compose up -d
 ./gradlew bootRun --args='--spring.profiles.active=local'
 ```
 
-A aplicação estará disponível em `http://localhost:8080`.
+A aplicação estará disponível em `http://localhost:8081`.
 
-Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+Swagger UI: `http://localhost:8081/swagger-ui/index.html`
 
 ### Usuário de teste local
 
@@ -172,8 +172,8 @@ Para compilar e rodar os testes:
 
 O repositório possui dois workflows do GitHub Actions:
 
-- **CI**: roda `./gradlew build` em toda `push` e `pull request` nas branches `main`, `develop` e `release`.
-- **Promote**: abre automaticamente PRs de `develop` para `release` e de `release` para `main`.
+- **CI**: roda `./gradlew build` em toda `push` e `pull request` nas branches `main`, `develop`, `release/**` e `feature/**`.
+- **Promote**: abre automaticamente PRs de `develop` para `release/v0.0.0` e de `release/v0.0.0` para `main`.
 
 ---
 
