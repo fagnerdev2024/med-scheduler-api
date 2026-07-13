@@ -3,11 +3,11 @@ name: Promote between environments
 on:
   push:
     branches:
+      - 'feature/**'
       - develop
-      - release
 
 permissions:
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
@@ -17,25 +17,29 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
       - name: Create promotion PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -e
           CURRENT_BRANCH="${GITHUB_REF#refs/heads/}"
+          VERSION=$(grep -oP 'version\s*=\s*"\K[^"]+' build.gradle.kts | sed 's/-SNAPSHOT//' || echo "0.0.1")
 
-          VERSION=$(grep -oP 'version\s*=\s*"\K[^"]+' build.gradle.kts | sed 's/-SNAPSHOT//' || echo "0.0.0")
-
-          if [ "$CURRENT_BRANCH" = "develop" ]; then
-            TARGET_BRANCH="release"
-            HEAD_BRANCH="develop"
-            TITLE="PR criado automaticamente. release/v${VERSION} <- develop"
-            BODY="PR automático para promover alterações do ambiente dev para release (homologação)."
-          elif [ "$CURRENT_BRANCH" = "release" ]; then
+          if [[ "$CURRENT_BRANCH" == feature/* ]]; then
+            TARGET_BRANCH="develop"
+            HEAD_BRANCH="$CURRENT_BRANCH"
+            TITLE="PR criado automaticamente. develop <- $HEAD_BRANCH"
+            BODY="PR automático para trazer as alterações da feature \`$HEAD_BRANCH\` para develop."
+          elif [ "$CURRENT_BRANCH" = "develop" ]; then
             TARGET_BRANCH="main"
-            HEAD_BRANCH="release"
-            TITLE="PR criado automaticamente. main <- release/v${VERSION}"
-            BODY="PR automático para promover alterações de release (homologação) para main (produção)."
+            HEAD_BRANCH="develop"
+            TITLE="PR criado automaticamente. main <- develop"
+            BODY="PR automático para promover alterações de develop para main (produção)."
           else
             echo "Branch $CURRENT_BRANCH not handled for promotion."
             exit 0
