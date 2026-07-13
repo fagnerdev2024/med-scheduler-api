@@ -56,7 +56,7 @@ jobs:
 
           # feature -> develop
           if [[ "$CURRENT_BRANCH" == feature/* ]]; then
-            local diff_count=$(git rev-list --count "origin/develop..origin/$CURRENT_BRANCH" 2>/dev/null || echo 0)
+            diff_count=$(git rev-list --count "origin/develop..origin/$CURRENT_BRANCH" 2>/dev/null || echo 0)
             if [ "$diff_count" -eq 0 ]; then
               echo "No changes between $CURRENT_BRANCH and develop. Skipping."
               exit 0
@@ -69,7 +69,7 @@ jobs:
 
           # release -> main
           if [[ "$CURRENT_BRANCH" == release/* ]]; then
-            local diff_count=$(git rev-list --count "origin/main..origin/$CURRENT_BRANCH" 2>/dev/null || echo 0)
+            diff_count=$(git rev-list --count "origin/main..origin/$CURRENT_BRANCH" 2>/dev/null || echo 0)
             if [ "$diff_count" -eq 0 ]; then
               echo "No changes between $CURRENT_BRANCH and main. Skipping."
               exit 0
@@ -82,22 +82,21 @@ jobs:
 
           # develop -> release (auto-increment version)
           if [ "$CURRENT_BRANCH" = "develop" ]; then
-            local develop_ahead=$(git rev-list --count "origin/main..origin/develop" 2>/dev/null || echo 0)
+            develop_ahead=$(git rev-list --count "origin/main..origin/develop" 2>/dev/null || echo 0)
             if [ "$develop_ahead" -eq 0 ]; then
               echo "develop is not ahead of main. No release needed."
               exit 0
             fi
 
             # find latest release branch by version
-            local latest_version=$(git ls-remote --heads origin 'release/v*' 2>/dev/null | sed -n 's|.*/release/v||p' | sort -V | tail -1)
-            local release_branch="release/v${latest_version:-0.0.0}"
+            latest_version=$(git ls-remote --heads origin 'release/v*' 2>/dev/null | sed -n 's|.*/release/v||p' | sort -V | tail -1)
+            release_branch="release/v${latest_version:-0.0.0}"
 
             # if latest release branch is merged to main, create the next one
             if [ -n "$latest_version" ]; then
-              local is_merged=$(gh pr list --state merged --base main --head "$release_branch" --json number --jq 'length')
+              is_merged=$(gh pr list --state merged --base main --head "$release_branch" --json number --jq 'length')
               if [ "$is_merged" -gt 0 ]; then
-                local previous_release_branch="$release_branch"
-                local major minor patch
+                previous_release_branch="$release_branch"
                 IFS=. read -r major minor patch <<< "$latest_version"
                 minor=$((minor + 1))
                 patch=0
@@ -125,7 +124,7 @@ jobs:
               echo "$release_branch already exists."
             fi
 
-            local diff_count=$(git rev-list --count "origin/$release_branch..origin/develop" 2>/dev/null || echo 0)
+            diff_count=$(git rev-list --count "origin/$release_branch..origin/develop" 2>/dev/null || echo 0)
             if [ "$diff_count" -eq 0 ]; then
               echo "No changes between develop and $release_branch. Skipping."
               exit 0
