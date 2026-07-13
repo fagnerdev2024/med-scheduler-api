@@ -5,6 +5,7 @@ on:
     branches:
       - 'feature/**'
       - develop
+      - 'release/**'
 
 permissions:
   contents: write
@@ -16,6 +17,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Configure Git
         run: |
@@ -28,32 +31,74 @@ jobs:
         run: |
           set -e
           CURRENT_BRANCH="${GITHUB_REF#refs/heads/}"
-          VERSION=$(grep -oP 'version\s*=\s*"\K[^"]+' build.gradle.kts | sed 's/-SNAPSHOT//' || echo "0.0.1")
+          RELEASE_BRANCH="release/v0.0.0"
+
+          create_pr() {
+            local target="$1"
+            local head="$2"
+            local title="$3"
+            local body="$4"
+
+            echo "Checking for existing PR from $head to $target..."
+            EXISTING=$(gh pr list --base "$target" --head "$head" --json number --jq 'length')
+
+            if [ "$EXISTING" -gt 0 ]; then
+              echo "PR already exists from $head to $target. Skipping."
+              return 0
+            fi
+
+            echo "Creating PR from $head to $target..."
+            gh pr create \
+              --base "$target" \
+              --head "$head" \
+              --title "$title" \
+              --body "$body"
+          }
 
           if [[ "$CURRENT_BRANCH" == feature/* ]]; then
             TARGET_BRANCH="develop"
             HEAD_BRANCH="$CURRENT_BRANCH"
+            DIFF_COUNT=$(git rev-list --count "origin/develop..origin/$HEAD_BRANCH" 2>/dev/null || echo 0)
+            if [ "$DIFF_COUNT" -eq 0 ]; then
+              echo "No changes between $HEAD_BRANCH and develop. Skipping."
+              exit 0
+            fi
             TITLE="PR criado automaticamente. develop <- $HEAD_BRANCH"
             BODY="PR automático para trazer as alterações da feature \`$HEAD_BRANCH\` para develop."
+            create_pr "$TARGET_BRANCH" "$HEAD_BRANCH" "$TITLE" "$BODY"
+
           elif [ "$CURRENT_BRANCH" = "develop" ]; then
-            TARGET_BRANCH="main"
+            if ! git rev-parse --verify "origin/$RELEASE_BRANCH" > /dev/null 2>&1; then
+              echo "Creating $RELEASE_BRANCH from main..."
+              git push origin "origin/main:refs/heads/$RELEASE_BRANCH"
+            else
+              echo "$RELEASE_BRANCH already exists."
+            fi
+
+            TARGET_BRANCH="$RELEASE_BRANCH"
             HEAD_BRANCH="develop"
-            TITLE="PR criado automaticamente. main <- develop"
-            BODY="PR automático para promover alterações de develop para main (produção)."
+            DIFF_COUNT=$(git rev-list --count "origin/$TARGET_BRANCH..origin/$HEAD_BRANCH" 2>/dev/null || echo 0)
+            if [ "$DIFF_COUNT" -eq 0 ]; then
+              echo "No changes between develop and $TARGET_BRANCH. Skipping."
+              exit 0
+            fi
+            TITLE="PR criado automaticamente. $RELEASE_BRANCH <- develop"
+            BODY="PR automático para promover alterações de develop para $RELEASE_BRANCH (homologação)."
+            create_pr "$TARGET_BRANCH" "$HEAD_BRANCH" "$TITLE" "$BODY"
+
+          elif [[ "$CURRENT_BRANCH" == release/* ]]; then
+            TARGET_BRANCH="main"
+            HEAD_BRANCH="$CURRENT_BRANCH"
+            DIFF_COUNT=$(git rev-list --count "origin/main..origin/$HEAD_BRANCH" 2>/dev/null || echo 0)
+            if [ "$DIFF_COUNT" -eq 0 ]; then
+              echo "No changes between $HEAD_BRANCH and main. Skipping."
+              exit 0
+            fi
+            TITLE="PR criado automaticamente. main <- $HEAD_BRANCH"
+            BODY="PR automático para promover alterações de $HEAD_BRANCH para main (produção)."
+            create_pr "$TARGET_BRANCH" "$HEAD_BRANCH" "$TITLE" "$BODY"
+
           else
             echo "Branch $CURRENT_BRANCH not handled for promotion."
             exit 0
           fi
-
-          EXISTING=$(gh pr list --base "$TARGET_BRANCH" --head "$HEAD_BRANCH" --json number --jq 'length')
-
-          if [ "$EXISTING" -gt 0 ]; then
-            echo "PR already exists from $HEAD_BRANCH to $TARGET_BRANCH. Skipping."
-            exit 0
-          fi
-
-          gh pr create \
-            --base "$TARGET_BRANCH" \
-            --head "$HEAD_BRANCH" \
-            --title "$TITLE" \
-            --body "$BODY"
