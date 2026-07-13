@@ -53,7 +53,7 @@ A aplicação utiliza profiles do Spring Boot para separar os ambientes:
 |---------|--------|-------|-----------|
 | `local` | sua máquina | PostgreSQL via Docker | desenvolvimento local |
 | `dev` | `develop` | Neon (dev) | desenvolvimento na nuvem |
-| `homol` | `release/v0.0.0` | Neon (homol) | homologação |
+| `homol` | `release/v*` | Neon (homol) | homologação |
 | `prod` | `main` | Neon (prod) | produção |
 
 ---
@@ -63,12 +63,12 @@ A aplicação utiliza profiles do Spring Boot para separar os ambientes:
 O repositório segue o fluxo Git Flow simplificado:
 
 ```
-feature/*  -> develop -> release/v0.0.0 -> main
+feature/*  -> develop -> release/v* -> main
 ```
 
 1. Uma `feature/*` é aberta para `develop`.
-2. Ao mergear em `develop`, o GitHub Actions abre automaticamente um PR `develop` -> `release/v0.0.0`.
-3. Ao mergear em `release/v0.0.0`, o GitHub Actions abre automaticamente um PR `release/v0.0.0` -> `main`.
+2. Ao mergear em `develop`, o GitHub Actions abre automaticamente um PR `develop` -> `release/v*`, incrementando a versão (ex: `release/v0.0.0`, `release/v0.1.0`, `release/v0.2.0`).
+3. Ao mergear em `release/v*`, o GitHub Actions abre automaticamente um PR `release/v*` -> `main`.
 
 Os serviços no Render fazem deploy a partir das branches correspondentes.
 
@@ -173,7 +173,7 @@ Para compilar e rodar os testes:
 O repositório possui dois workflows do GitHub Actions:
 
 - **CI**: roda `./gradlew build` em toda `push` e `pull request` nas branches `main`, `develop`, `release/**` e `feature/**`.
-- **Promote**: abre automaticamente PRs de `develop` para `release/v0.0.0` e de `release/v0.0.0` para `main`.
+- **Promote**: abre automaticamente PRs de `develop` para `release/v*` e de `release/v*` para `main`.
 
 ---
 

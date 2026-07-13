@@ -31,7 +31,6 @@ jobs:
         run: |
           set -e
           CURRENT_BRANCH="${GITHUB_REF#refs/heads/}"
-          RELEASE_BRANCH="release/v0.0.0"
 
           create_pr() {
             local target="$1"
@@ -40,9 +39,9 @@ jobs:
             local body="$4"
 
             echo "Checking for existing PR from $head to $target..."
-            EXISTING=$(gh pr list --base "$target" --head "$head" --json number --jq 'length')
+            local existing=$(gh pr list --base "$target" --head "$head" --json number --jq 'length')
 
-            if [ "$EXISTING" -gt 0 ]; then
+            if [ "$existing" -gt 0 ]; then
               echo "PR already exists from $head to $target. Skipping."
               return 0
             fi
@@ -55,50 +54,87 @@ jobs:
               --body "$body"
           }
 
+          # feature -> develop
           if [[ "$CURRENT_BRANCH" == feature/* ]]; then
-            TARGET_BRANCH="develop"
-            HEAD_BRANCH="$CURRENT_BRANCH"
-            DIFF_COUNT=$(git rev-list --count "origin/develop..origin/$HEAD_BRANCH" 2>/dev/null || echo 0)
-            if [ "$DIFF_COUNT" -eq 0 ]; then
-              echo "No changes between $HEAD_BRANCH and develop. Skipping."
+            local diff_count=$(git rev-list --count "origin/develop..origin/$CURRENT_BRANCH" 2>/dev/null || echo 0)
+            if [ "$diff_count" -eq 0 ]; then
+              echo "No changes between $CURRENT_BRANCH and develop. Skipping."
               exit 0
             fi
-            TITLE="PR criado automaticamente. develop <- $HEAD_BRANCH"
-            BODY="PR automático para trazer as alterações da feature \`$HEAD_BRANCH\` para develop."
-            create_pr "$TARGET_BRANCH" "$HEAD_BRANCH" "$TITLE" "$BODY"
-
-          elif [ "$CURRENT_BRANCH" = "develop" ]; then
-            if ! git rev-parse --verify "origin/$RELEASE_BRANCH" > /dev/null 2>&1; then
-              echo "Creating $RELEASE_BRANCH from main..."
-              git push origin "origin/main:refs/heads/$RELEASE_BRANCH"
-            else
-              echo "$RELEASE_BRANCH already exists."
-            fi
-
-            TARGET_BRANCH="$RELEASE_BRANCH"
-            HEAD_BRANCH="develop"
-            DIFF_COUNT=$(git rev-list --count "origin/$TARGET_BRANCH..origin/$HEAD_BRANCH" 2>/dev/null || echo 0)
-            if [ "$DIFF_COUNT" -eq 0 ]; then
-              echo "No changes between develop and $TARGET_BRANCH. Skipping."
-              exit 0
-            fi
-            TITLE="PR criado automaticamente. $RELEASE_BRANCH <- develop"
-            BODY="PR automático para promover alterações de develop para $RELEASE_BRANCH (homologação)."
-            create_pr "$TARGET_BRANCH" "$HEAD_BRANCH" "$TITLE" "$BODY"
-
-          elif [[ "$CURRENT_BRANCH" == release/* ]]; then
-            TARGET_BRANCH="main"
-            HEAD_BRANCH="$CURRENT_BRANCH"
-            DIFF_COUNT=$(git rev-list --count "origin/main..origin/$HEAD_BRANCH" 2>/dev/null || echo 0)
-            if [ "$DIFF_COUNT" -eq 0 ]; then
-              echo "No changes between $HEAD_BRANCH and main. Skipping."
-              exit 0
-            fi
-            TITLE="PR criado automaticamente. main <- $HEAD_BRANCH"
-            BODY="PR automático para promover alterações de $HEAD_BRANCH para main (produção)."
-            create_pr "$TARGET_BRANCH" "$HEAD_BRANCH" "$TITLE" "$BODY"
-
-          else
-            echo "Branch $CURRENT_BRANCH not handled for promotion."
+            create_pr "develop" "$CURRENT_BRANCH" \
+              "PR criado automaticamente. develop <- $CURRENT_BRANCH" \
+              "PR automático para trazer as alterações da feature \`$CURRENT_BRANCH\` para develop."
             exit 0
           fi
+
+          # release -> main
+          if [[ "$CURRENT_BRANCH" == release/* ]]; then
+            local diff_count=$(git rev-list --count "origin/main..origin/$CURRENT_BRANCH" 2>/dev/null || echo 0)
+            if [ "$diff_count" -eq 0 ]; then
+              echo "No changes between $CURRENT_BRANCH and main. Skipping."
+              exit 0
+            fi
+            create_pr "main" "$CURRENT_BRANCH" \
+              "PR criado automaticamente. main <- $CURRENT_BRANCH" \
+              "PR automático para promover alterações de $CURRENT_BRANCH para main (produção)."
+            exit 0
+          fi
+
+          # develop -> release (auto-increment version)
+          if [ "$CURRENT_BRANCH" = "develop" ]; then
+            local develop_ahead=$(git rev-list --count "origin/main..origin/develop" 2>/dev/null || echo 0)
+            if [ "$develop_ahead" -eq 0 ]; then
+              echo "develop is not ahead of main. No release needed."
+              exit 0
+            fi
+
+            # find latest release branch by version
+            local latest_version=$(git ls-remote --heads origin 'release/v*' 2>/dev/null | sed -n 's|.*/release/v||p' | sort -V | tail -1)
+            local release_branch="release/v${latest_version:-0.0.0}"
+
+            # if latest release branch is merged to main, create the next one
+            if [ -n "$latest_version" ]; then
+              local is_merged=$(gh pr list --state merged --base main --head "$release_branch" --json number --jq 'length')
+              if [ "$is_merged" -gt 0 ]; then
+                local previous_release_branch="$release_branch"
+                local major minor patch
+                IFS=. read -r major minor patch <<< "$latest_version"
+                minor=$((minor + 1))
+                patch=0
+                release_branch="release/v${major}.${minor}.${patch}"
+                echo "Latest release $previous_release_branch is merged. Creating next release $release_branch."
+              else
+                echo "Using existing release branch $release_branch."
+              fi
+            else
+              echo "No release branch found. Creating $release_branch."
+            fi
+
+            # create release branch from main if it does not exist
+            if ! git rev-parse --verify "origin/$release_branch" > /dev/null 2>&1; then
+              echo "Creating $release_branch from main..."
+              git checkout -B "$release_branch" origin/main
+              sed -i -E "s|branch: release/v[0-9]+\\.[0-9]+\\.[0-9]+|branch: $release_branch|" render.yaml
+              if ! git diff --quiet; then
+                git add render.yaml
+                git commit -m "chore: aponta homol para $release_branch"
+              fi
+              git push -u origin "$release_branch"
+              git checkout develop
+            else
+              echo "$release_branch already exists."
+            fi
+
+            local diff_count=$(git rev-list --count "origin/$release_branch..origin/develop" 2>/dev/null || echo 0)
+            if [ "$diff_count" -eq 0 ]; then
+              echo "No changes between develop and $release_branch. Skipping."
+              exit 0
+            fi
+
+            create_pr "$release_branch" "develop" \
+              "PR criado automaticamente. $release_branch <- develop" \
+              "PR automático para promover alterações de develop para $release_branch (homologação)."
+            exit 0
+          fi
+
+          echo "Branch $CURRENT_BRANCH not handled for promotion."
