@@ -10,7 +10,7 @@ class Endereco(
     var numero: String,
     var complemento: String?,
     var cidade: String,
-    var uf: String
+    var uf: String,
 ) {
     fun atualizarInformacoes(
         logradouro: String?,
@@ -19,7 +19,7 @@ class Endereco(
         numero: String?,
         complemento: String?,
         cidade: String?,
-        uf: String?
+        uf: String?,
     ) {
         logradouro?.let { this.logradouro = it }
         bairro?.let { this.bairro = it }
@@ -35,12 +35,12 @@ class Endereco(
         if (other !is Endereco) return false
 
         return logradouro == other.logradouro &&
-                bairro == other.bairro &&
-                cep == other.cep &&
-                numero == other.numero &&
-                complemento == other.complemento &&
-                cidade == other.cidade &&
-                uf == other.uf
+            bairro == other.bairro &&
+            cep == other.cep &&
+            numero == other.numero &&
+            complemento == other.complemento &&
+            cidade == other.cidade &&
+            uf == other.uf
     }
 
     override fun hashCode(): Int {

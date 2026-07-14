@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class UsuarioRepositoryAdapter(
-    private val jpaRepository: UsuarioJpaRepository
+    private val jpaRepository: UsuarioJpaRepository,
 ) : UsuarioRepository {
     override fun save(usuario: Usuario): Usuario {
         return jpaRepository.save(usuario)

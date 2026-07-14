@@ -2,7 +2,6 @@ package com.med.scheduler.application.service
 
 import com.med.scheduler.application.dto.*
 import com.med.scheduler.domain.model.Consulta
-import com.med.scheduler.domain.model.Medico
 import com.med.scheduler.domain.repository.ConsultaRepository
 import com.med.scheduler.domain.repository.MedicoRepository
 import com.med.scheduler.domain.repository.PacienteRepository
@@ -19,7 +18,7 @@ import java.time.LocalDateTime
 class ConsultaUseCase(
     private val consultaRepository: ConsultaRepository,
     private val medicoRepository: MedicoRepository,
-    private val pacienteRepository: PacienteRepository
+    private val pacienteRepository: PacienteRepository,
 ) {
     private val log = LoggerFactory.getLogger(ConsultaUseCase::class.java)
 
@@ -29,49 +28,61 @@ class ConsultaUseCase(
 
         validarHorarioAgendamento(dadosAgendamento.data)
 
-        val paciente = pacienteRepository.findById(dadosAgendamento.idPaciente)
-            ?: throw IllegalArgumentException("Paciente não encontrado.")
+        val paciente =
+            pacienteRepository.findById(dadosAgendamento.idPaciente)
+                ?: throw IllegalArgumentException("Paciente não encontrado.")
 
         if (!paciente.ativo) {
             throw IllegalStateException("Paciente está inativo.")
         }
 
-        val medico = if (dadosAgendamento.idMedico != null) {
-            val medicoEscolhido = medicoRepository.findById(dadosAgendamento.idMedico)
-                ?: throw IllegalArgumentException("Médico não encontrado.")
+        val medico =
+            if (dadosAgendamento.idMedico != null) {
+                val medicoEscolhido =
+                    medicoRepository.findById(dadosAgendamento.idMedico)
+                        ?: throw IllegalArgumentException("Médico não encontrado.")
 
-            if (!medicoEscolhido.ativo) {
-                throw IllegalStateException("Médico está inativo.")
+                if (!medicoEscolhido.ativo) {
+                    throw IllegalStateException("Médico está inativo.")
+                }
+
+                if (consultaRepository.existsByMedicoIdAndDataAndMotivoCancelamentoIsNull(
+                        medicoEscolhido.id!!,
+                        dadosAgendamento.data,
+                    )
+                ) {
+                    throw IllegalStateException("Médico já possui consulta agendada neste horário.")
+                }
+
+                medicoEscolhido
+            } else {
+                val especialidade =
+                    dadosAgendamento.especialidade
+                        ?: throw IllegalArgumentException("Especialidade é obrigatória quando médico não for escolhido.")
+
+                medicoRepository.escolherMedicoAleatorioLivreNaData(especialidade, dadosAgendamento.data)
+                    ?: throw IllegalStateException("Nenhum médico disponível para a especialidade e data informados.")
             }
-
-            if (consultaRepository.existsByMedicoIdAndDataAndMotivoCancelamentoIsNull(
-                    medicoEscolhido.id!!, dadosAgendamento.data)) {
-                throw IllegalStateException("Médico já possui consulta agendada neste horário.")
-            }
-
-            medicoEscolhido
-        } else {
-            val especialidade = dadosAgendamento.especialidade
-                ?: throw IllegalArgumentException("Especialidade é obrigatória quando médico não for escolhido.")
-
-            medicoRepository.escolherMedicoAleatorioLivreNaData(especialidade, dadosAgendamento.data)
-                ?: throw IllegalStateException("Nenhum médico disponível para a especialidade e data informados.")
-        }
 
         val inicioDia = dadosAgendamento.data.withHour(7)
         val fimDia = dadosAgendamento.data.withHour(18)
 
         if (consultaRepository.existsByPacienteIdAndDataBetweenAndMotivoCancelamentoIsNull(
-                paciente.id!!, inicioDia, fimDia)) {
+                paciente.id!!,
+                inicioDia,
+                fimDia,
+            )
+        ) {
             throw IllegalStateException("Paciente já possui consulta agendada neste dia.")
         }
 
-        val consulta = Consulta(
-            medico = medico,
-            paciente = paciente,
-            data = dadosAgendamento.data,
-            motivoCancelamento = null
-        )
+        val consulta =
+            Consulta(
+                medico = medico,
+                paciente = paciente,
+                data = dadosAgendamento.data,
+                motivoCancelamento = null,
+            )
 
         val consultaSalva = consultaRepository.save(consulta)
         log.info("Consulta agendada com sucesso: {}", consultaSalva.id)
@@ -90,8 +101,9 @@ class ConsultaUseCase(
     fun cancelar(dadosCancelamento: DadosCancelamentoConsulta) {
         log.info("Iniciando cancelamento da consulta: {}", dadosCancelamento.idConsulta)
 
-        val consulta = consultaRepository.findById(dadosCancelamento.idConsulta)
-            ?: throw IllegalArgumentException("Consulta não encontrada.")
+        val consulta =
+            consultaRepository.findById(dadosCancelamento.idConsulta)
+                ?: throw IllegalArgumentException("Consulta não encontrada.")
 
         if (consulta.motivoCancelamento != null) {
             throw IllegalStateException("Consulta já está cancelada.")
@@ -113,8 +125,9 @@ class ConsultaUseCase(
     fun detalhar(id: Long): DadosDetalhamentoConsulta {
         log.info("Iniciando detalhamento da consulta: {}", id)
 
-        val consulta = consultaRepository.findById(id)
-            ?: throw IllegalArgumentException("Consulta não encontrada.")
+        val consulta =
+            consultaRepository.findById(id)
+                ?: throw IllegalArgumentException("Consulta não encontrada.")
 
         return consulta.toDetalhamentoDTO()
     }

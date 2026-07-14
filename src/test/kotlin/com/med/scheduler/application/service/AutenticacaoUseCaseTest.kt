@@ -11,34 +11,36 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 
 class AutenticacaoUseCaseTest {
-
     private val authenticationManager: AuthenticationManager = mock()
     private val tokenService: TokenService = mock()
     private val autenticacaoUseCase = AutenticacaoUseCase(authenticationManager, tokenService)
 
     @Test
     fun `deve autenticar usuario e retornar token JWT`() {
-        val dadosAutenticacao = DadosAutenticacao(
-            login = "usuario@teste.com",
-            senha = "senha123"
-        )
+        val dadosAutenticacao =
+            DadosAutenticacao(
+                login = "usuario@teste.com",
+                senha = "senha123",
+            )
 
-        val userDetails = User(
-            dadosAutenticacao.login,
-            dadosAutenticacao.senha,
-            listOf(SimpleGrantedAuthority("ROLE_USER"))
-        )
+        val userDetails =
+            User(
+                dadosAutenticacao.login,
+                dadosAutenticacao.senha,
+                listOf(SimpleGrantedAuthority("ROLE_USER")),
+            )
 
-        val authentication = UsernamePasswordAuthenticationToken(
-            userDetails,
-            null,
-            userDetails.authorities
-        )
+        val authentication =
+            UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.authorities,
+            )
 
         whenever(
             authenticationManager.authenticate(
-                eq(UsernamePasswordAuthenticationToken(dadosAutenticacao.login, dadosAutenticacao.senha))
-            )
+                eq(UsernamePasswordAuthenticationToken(dadosAutenticacao.login, dadosAutenticacao.senha)),
+            ),
         ).thenReturn(authentication)
 
         whenever(tokenService.gerarToken(userDetails)).thenReturn("token-jwt-123")
@@ -48,7 +50,7 @@ class AutenticacaoUseCaseTest {
         assertEquals("token-jwt-123", resultado.token)
 
         verify(authenticationManager).authenticate(
-            eq(UsernamePasswordAuthenticationToken(dadosAutenticacao.login, dadosAutenticacao.senha))
+            eq(UsernamePasswordAuthenticationToken(dadosAutenticacao.login, dadosAutenticacao.senha)),
         )
         verify(tokenService).gerarToken(userDetails)
     }

@@ -8,5 +8,5 @@ data class DadosListagemMedico(
     val email: String,
     val crm: String,
     val especialidade: Especialidade,
-    val ativo: Boolean
+    val ativo: Boolean,
 )

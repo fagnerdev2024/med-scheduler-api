@@ -7,5 +7,5 @@ data class DadosDetalhamentoPaciente(
     val cpf: String,
     val telefone: String,
     val endereco: DadosEndereco,
-    val ativo: Boolean
+    val ativo: Boolean,
 )

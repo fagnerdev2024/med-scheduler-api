@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 
 @Component
 class MedicoRepositoryAdapter(
-    private val jpaRepository: MedicoJpaRepository
+    private val jpaRepository: MedicoJpaRepository,
 ) : MedicoRepository {
     override fun save(medico: Medico): Medico {
         return jpaRepository.save(medico)
@@ -28,7 +28,10 @@ class MedicoRepositoryAdapter(
         return jpaRepository.findAtivoById(id)
     }
 
-    override fun escolherMedicoAleatorioLivreNaData(especialidade: Especialidade, data: LocalDateTime): Medico? {
+    override fun escolherMedicoAleatorioLivreNaData(
+        especialidade: Especialidade,
+        data: LocalDateTime,
+    ): Medico? {
         return jpaRepository.escolherMedicoAleatorioLivreNaData(especialidade, data)
     }
 

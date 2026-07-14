@@ -1,7 +1,7 @@
 package com.med.scheduler.domain.model
 
-import jakarta.persistence.*
 import com.med.scheduler.domain.model.enums.Especialidade
+import jakarta.persistence.*
 
 @Table(name = "medicos")
 @Entity(name = "Medico")
@@ -9,24 +9,21 @@ class Medico(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-
     var nome: String,
-
     var email: String,
-
     var telefone: String,
-
     var crm: String,
-
     @Enumerated(EnumType.STRING)
     var especialidade: Especialidade,
-
     @Embedded
     var endereco: Endereco,
-
-    var ativo: Boolean = true
+    var ativo: Boolean = true,
 ) {
-    fun atualizarInformacoes(nome: String?, telefone: String?, endereco: Endereco?) {
+    fun atualizarInformacoes(
+        nome: String?,
+        telefone: String?,
+        endereco: Endereco?,
+    ) {
         nome?.let { this.nome = it }
         telefone?.let { this.telefone = it }
         endereco?.let { this.endereco = it }
@@ -41,7 +38,7 @@ class Medico(
         numero: String?,
         complemento: String?,
         cidade: String?,
-        uf: String?
+        uf: String?,
     ) {
         nome?.let { this.nome = it }
         telefone?.let { this.telefone = it }

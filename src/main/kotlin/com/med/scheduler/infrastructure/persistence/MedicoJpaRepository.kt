@@ -11,7 +11,8 @@ import java.time.LocalDateTime
 interface MedicoJpaRepository : JpaRepository<Medico, Long> {
     fun findAllByAtivoTrue(paginacao: Pageable): Page<Medico>
 
-    @Query("""
+    @Query(
+        """
         select m from Medico m
         where
         m.ativo = true
@@ -27,15 +28,21 @@ interface MedicoJpaRepository : JpaRepository<Medico, Long> {
         )
         order by rand()
         limit 1
-    """)
-    fun escolherMedicoAleatorioLivreNaData(especialidade: Especialidade, data: LocalDateTime): Medico?
+    """,
+    )
+    fun escolherMedicoAleatorioLivreNaData(
+        especialidade: Especialidade,
+        data: LocalDateTime,
+    ): Medico?
 
-    @Query("""
+    @Query(
+        """
         select m.ativo
         from Medico m
         where
         m.id = :id
-    """)
+    """,
+    )
     fun findAtivoById(id: Long): Boolean?
 
     @Query("SELECT DISTINCT m.nome FROM Medico m WHERE m.ativo = true")

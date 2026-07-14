@@ -11,7 +11,6 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class SpringDocConfigurations {
-
     @Bean
     fun customOpenAPI(): OpenAPI {
         return OpenAPI()
@@ -22,8 +21,8 @@ class SpringDocConfigurations {
                         SecurityScheme()
                             .type(SecurityScheme.Type.HTTP)
                             .scheme("bearer")
-                            .bearerFormat("JWT")
-                    )
+                            .bearerFormat("JWT"),
+                    ),
             )
             .info(
                 Info()
@@ -32,13 +31,13 @@ class SpringDocConfigurations {
                     .contact(
                         Contact()
                             .name("Time Backend")
-                            .email("backend@medscheduler.dev")
+                            .email("backend@medscheduler.dev"),
                     )
                     .license(
                         License()
                             .name("Apache 2.0")
-                            .url("https://www.apache.org/licenses/LICENSE-2.0")
-                    )
+                            .url("https://www.apache.org/licenses/LICENSE-2.0"),
+                    ),
             )
     }
 }

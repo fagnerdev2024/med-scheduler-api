@@ -11,10 +11,12 @@ interface PacienteJpaRepository : JpaRepository<Paciente, Long> {
 
     fun findAllByAtivoTrue(paginacao: Pageable): Page<Paciente>
 
-    @Query("""
+    @Query(
+        """
         select p.ativo
         from Paciente p
         where p.id = :id
-    """)
+    """,
+    )
     fun findAtivoById(id: Long): Boolean?
 }

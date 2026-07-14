@@ -1,0 +1,45 @@
+name: Smoke test after deploy
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  PROD_URL: ${{ vars.PROD_URL || 'https://med-scheduler-api-1.onrender.com' }}
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Wait for Render deploy and health check
+        run: |
+          echo "Aguardando deploy em $PROD_URL ..."
+          for i in $(seq 1 20); do
+            status=$(curl -s -o /dev/null -w "%{http_code}" "$PROD_URL/actuator/health" || echo "000")
+            echo "Tentativa $i: HTTP $status"
+            if [ "$status" = "200" ]; then
+              echo "Smoke test passou!"
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "Smoke test falhou: health check nao retornou 200" >&2
+          exit 1
+
+      - name: Notify merged PR
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pr=$(gh pr list --base main --state merged --limit 1 --json number --jq '.[0].number')
+          if [ -n "$pr" ]; then
+            gh pr comment "$pr" --body "Deploy de producao concluido. Health check retornou 200 em $PROD_URL/actuator/health"
+          fi

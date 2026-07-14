@@ -17,7 +17,6 @@ import java.time.DayOfWeek
 import java.time.LocalDateTime
 
 class ConsultaUseCaseTest {
-
     private val consultaRepository: ConsultaRepository = mock()
     private val medicoRepository: MedicoRepository = mock()
     private val pacienteRepository: PacienteRepository = mock()
@@ -28,13 +27,17 @@ class ConsultaUseCaseTest {
         clearInvocations(consultaRepository, medicoRepository, pacienteRepository)
     }
 
-    private fun dataFutura(hora: Int = 10, minuto: Int = 0): LocalDateTime {
-        var data = LocalDateTime.now()
-            .plusDays(1)
-            .withHour(hora)
-            .withMinute(minuto)
-            .withSecond(0)
-            .withNano(0)
+    private fun dataFutura(
+        hora: Int = 10,
+        minuto: Int = 0,
+    ): LocalDateTime {
+        var data =
+            LocalDateTime.now()
+                .plusDays(1)
+                .withHour(hora)
+                .withMinute(minuto)
+                .withSecond(0)
+                .withNano(0)
 
         while (data.dayOfWeek == DayOfWeek.SUNDAY) {
             data = data.plusDays(1)
@@ -50,24 +53,25 @@ class ConsultaUseCaseTest {
         val medicoId = medico.id!!
         val paciente = TestFixtures.paciente()
         val pacienteId = paciente.id!!
-        val dadosAgendamento = TestFixtures.dadosAgendamentoConsulta(
-            idMedico = medicoId,
-            idPaciente = pacienteId,
-            data = data
-        )
+        val dadosAgendamento =
+            TestFixtures.dadosAgendamentoConsulta(
+                idMedico = medicoId,
+                idPaciente = pacienteId,
+                data = data,
+            )
         val consultaEsperada = TestFixtures.consulta(data = data, medico = medico, paciente = paciente)
 
         whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
         whenever(medicoRepository.findById(medicoId)).thenReturn(medico)
         whenever(
-            consultaRepository.existsByMedicoIdAndDataAndMotivoCancelamentoIsNull(medicoId, data)
+            consultaRepository.existsByMedicoIdAndDataAndMotivoCancelamentoIsNull(medicoId, data),
         ).thenReturn(false)
         whenever(
             consultaRepository.existsByPacienteIdAndDataBetweenAndMotivoCancelamentoIsNull(
                 pacienteId,
                 data.withHour(7),
-                data.withHour(18)
-            )
+                data.withHour(18),
+            ),
         ).thenReturn(false)
         whenever(consultaRepository.save(any())).thenReturn(consultaEsperada)
 
@@ -88,24 +92,25 @@ class ConsultaUseCaseTest {
         val paciente = TestFixtures.paciente()
         val pacienteId = paciente.id!!
         val especialidade = Especialidade.CARDIOLOGIA
-        val dadosAgendamento = TestFixtures.dadosAgendamentoConsulta(
-            idMedico = null,
-            idPaciente = pacienteId,
-            data = data,
-            especialidade = especialidade
-        )
+        val dadosAgendamento =
+            TestFixtures.dadosAgendamentoConsulta(
+                idMedico = null,
+                idPaciente = pacienteId,
+                data = data,
+                especialidade = especialidade,
+            )
         val consultaEsperada = TestFixtures.consulta(data = data, medico = medico, paciente = paciente)
 
         whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
         whenever(
-            medicoRepository.escolherMedicoAleatorioLivreNaData(especialidade, data)
+            medicoRepository.escolherMedicoAleatorioLivreNaData(especialidade, data),
         ).thenReturn(medico)
         whenever(
             consultaRepository.existsByPacienteIdAndDataBetweenAndMotivoCancelamentoIsNull(
                 pacienteId,
                 data.withHour(7),
-                data.withHour(18)
-            )
+                data.withHour(18),
+            ),
         ).thenReturn(false)
         whenever(consultaRepository.save(any())).thenReturn(consultaEsperada)
 
@@ -123,9 +128,10 @@ class ConsultaUseCaseTest {
         val data = LocalDateTime.now().plusMinutes(10)
         val dadosAgendamento = TestFixtures.dadosAgendamentoConsulta(data = data)
 
-        val exception = assertThrows(IllegalStateException::class.java) {
-            consultaUseCase.agendar(dadosAgendamento)
-        }
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                consultaUseCase.agendar(dadosAgendamento)
+            }
 
         assertEquals("Consulta deve ser agendada com pelo menos 30 minutos de antecedência.", exception.message)
         verifyNoInteractions(pacienteRepository, medicoRepository, consultaRepository)
@@ -140,13 +146,14 @@ class ConsultaUseCaseTest {
 
         val dadosAgendamento = TestFixtures.dadosAgendamentoConsulta(data = data)
 
-        val exception = assertThrows(IllegalStateException::class.java) {
-            consultaUseCase.agendar(dadosAgendamento)
-        }
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                consultaUseCase.agendar(dadosAgendamento)
+            }
 
         assertEquals(
             "Consulta fora do horário de funcionamento da clínica (Seg-Sáb, 07:00 às 18:00).",
-            exception.message
+            exception.message,
         )
         verifyNoInteractions(pacienteRepository, medicoRepository, consultaRepository)
     }
@@ -156,13 +163,14 @@ class ConsultaUseCaseTest {
         val data = dataFutura(hora = 19)
         val dadosAgendamento = TestFixtures.dadosAgendamentoConsulta(data = data)
 
-        val exception = assertThrows(IllegalStateException::class.java) {
-            consultaUseCase.agendar(dadosAgendamento)
-        }
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                consultaUseCase.agendar(dadosAgendamento)
+            }
 
         assertEquals(
             "Consulta fora do horário de funcionamento da clínica (Seg-Sáb, 07:00 às 18:00).",
-            exception.message
+            exception.message,
         )
     }
 
@@ -171,16 +179,18 @@ class ConsultaUseCaseTest {
         val data = dataFutura()
         val paciente = TestFixtures.paciente(ativo = false)
         val pacienteId = paciente.id!!
-        val dadosAgendamento = TestFixtures.dadosAgendamentoConsulta(
-            idPaciente = pacienteId,
-            data = data
-        )
+        val dadosAgendamento =
+            TestFixtures.dadosAgendamentoConsulta(
+                idPaciente = pacienteId,
+                data = data,
+            )
 
         whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
 
-        val exception = assertThrows(IllegalStateException::class.java) {
-            consultaUseCase.agendar(dadosAgendamento)
-        }
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                consultaUseCase.agendar(dadosAgendamento)
+            }
 
         assertEquals("Paciente está inativo.", exception.message)
     }
@@ -190,17 +200,19 @@ class ConsultaUseCaseTest {
         val data = dataFutura()
         val paciente = TestFixtures.paciente()
         val pacienteId = paciente.id!!
-        val dadosAgendamento = TestFixtures.dadosAgendamentoConsulta(
-            idPaciente = pacienteId,
-            data = data
-        )
+        val dadosAgendamento =
+            TestFixtures.dadosAgendamentoConsulta(
+                idPaciente = pacienteId,
+                data = data,
+            )
 
         whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
         whenever(medicoRepository.findById(dadosAgendamento.idMedico!!)).thenReturn(null)
 
-        val exception = assertThrows(IllegalArgumentException::class.java) {
-            consultaUseCase.agendar(dadosAgendamento)
-        }
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                consultaUseCase.agendar(dadosAgendamento)
+            }
 
         assertEquals("Médico não encontrado.", exception.message)
     }
@@ -212,18 +224,20 @@ class ConsultaUseCaseTest {
         val pacienteId = paciente.id!!
         val medico = TestFixtures.medico(ativo = false)
         val medicoId = medico.id!!
-        val dadosAgendamento = TestFixtures.dadosAgendamentoConsulta(
-            idMedico = medicoId,
-            idPaciente = pacienteId,
-            data = data
-        )
+        val dadosAgendamento =
+            TestFixtures.dadosAgendamentoConsulta(
+                idMedico = medicoId,
+                idPaciente = pacienteId,
+                data = data,
+            )
 
         whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
         whenever(medicoRepository.findById(medicoId)).thenReturn(medico)
 
-        val exception = assertThrows(IllegalStateException::class.java) {
-            consultaUseCase.agendar(dadosAgendamento)
-        }
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                consultaUseCase.agendar(dadosAgendamento)
+            }
 
         assertEquals("Médico está inativo.", exception.message)
     }
@@ -235,21 +249,23 @@ class ConsultaUseCaseTest {
         val medicoId = medico.id!!
         val paciente = TestFixtures.paciente()
         val pacienteId = paciente.id!!
-        val dadosAgendamento = TestFixtures.dadosAgendamentoConsulta(
-            idMedico = medicoId,
-            idPaciente = pacienteId,
-            data = data
-        )
+        val dadosAgendamento =
+            TestFixtures.dadosAgendamentoConsulta(
+                idMedico = medicoId,
+                idPaciente = pacienteId,
+                data = data,
+            )
 
         whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
         whenever(medicoRepository.findById(medicoId)).thenReturn(medico)
         whenever(
-            consultaRepository.existsByMedicoIdAndDataAndMotivoCancelamentoIsNull(medicoId, data)
+            consultaRepository.existsByMedicoIdAndDataAndMotivoCancelamentoIsNull(medicoId, data),
         ).thenReturn(true)
 
-        val exception = assertThrows(IllegalStateException::class.java) {
-            consultaUseCase.agendar(dadosAgendamento)
-        }
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                consultaUseCase.agendar(dadosAgendamento)
+            }
 
         assertEquals("Médico já possui consulta agendada neste horário.", exception.message)
     }
@@ -261,28 +277,30 @@ class ConsultaUseCaseTest {
         val medicoId = medico.id!!
         val paciente = TestFixtures.paciente()
         val pacienteId = paciente.id!!
-        val dadosAgendamento = TestFixtures.dadosAgendamentoConsulta(
-            idMedico = medicoId,
-            idPaciente = pacienteId,
-            data = data
-        )
+        val dadosAgendamento =
+            TestFixtures.dadosAgendamentoConsulta(
+                idMedico = medicoId,
+                idPaciente = pacienteId,
+                data = data,
+            )
 
         whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
         whenever(medicoRepository.findById(medicoId)).thenReturn(medico)
         whenever(
-            consultaRepository.existsByMedicoIdAndDataAndMotivoCancelamentoIsNull(medicoId, data)
+            consultaRepository.existsByMedicoIdAndDataAndMotivoCancelamentoIsNull(medicoId, data),
         ).thenReturn(false)
         whenever(
             consultaRepository.existsByPacienteIdAndDataBetweenAndMotivoCancelamentoIsNull(
                 pacienteId,
                 data.withHour(7),
-                data.withHour(18)
-            )
+                data.withHour(18),
+            ),
         ).thenReturn(true)
 
-        val exception = assertThrows(IllegalStateException::class.java) {
-            consultaUseCase.agendar(dadosAgendamento)
-        }
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                consultaUseCase.agendar(dadosAgendamento)
+            }
 
         assertEquals("Paciente já possui consulta agendada neste dia.", exception.message)
     }
@@ -334,18 +352,20 @@ class ConsultaUseCaseTest {
     @Test
     fun `deve lancar excecao ao cancelar consulta ja cancelada`() {
         val data = LocalDateTime.now().plusDays(2).withHour(10).withMinute(0)
-        val consulta = TestFixtures.consulta(
-            data = data,
-            motivoCancelamento = MotivoCancelamento.MEDICO_CANCELOU
-        )
+        val consulta =
+            TestFixtures.consulta(
+                data = data,
+                motivoCancelamento = MotivoCancelamento.MEDICO_CANCELOU,
+            )
         val consultaId = consulta.id!!
         val dadosCancelamento = TestFixtures.dadosCancelamentoConsulta(idConsulta = consultaId)
 
         whenever(consultaRepository.findById(consultaId)).thenReturn(consulta)
 
-        val exception = assertThrows(IllegalStateException::class.java) {
-            consultaUseCase.cancelar(dadosCancelamento)
-        }
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                consultaUseCase.cancelar(dadosCancelamento)
+            }
 
         assertEquals("Consulta já está cancelada.", exception.message)
         verify(consultaRepository, never()).save(any<Consulta>())
@@ -360,13 +380,14 @@ class ConsultaUseCaseTest {
 
         whenever(consultaRepository.findById(consultaId)).thenReturn(consulta)
 
-        val exception = assertThrows(IllegalStateException::class.java) {
-            consultaUseCase.cancelar(dadosCancelamento)
-        }
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                consultaUseCase.cancelar(dadosCancelamento)
+            }
 
         assertEquals(
             "Consulta só pode ser cancelada com antecedência mínima de 24 horas.",
-            exception.message
+            exception.message,
         )
         verify(consultaRepository, never()).save(any<Consulta>())
     }

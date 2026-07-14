@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class MedicoUseCase(
-    private val medicoRepository: MedicoRepository
+    private val medicoRepository: MedicoRepository,
 ) {
     private val log = LoggerFactory.getLogger(MedicoUseCase::class.java)
     private val MAX_PAGE_SIZE = 100
@@ -20,15 +20,16 @@ class MedicoUseCase(
     fun cadastrar(dadosCadastroMedico: DadosCadastroMedico): DadosDetalhamentoMedico {
         log.info("Iniciando cadastro do médico: {}", dadosCadastroMedico.nome)
 
-        val medico = Medico(
-            nome = dadosCadastroMedico.nome,
-            email = dadosCadastroMedico.email,
-            telefone = dadosCadastroMedico.telefone,
-            crm = dadosCadastroMedico.crm,
-            especialidade = dadosCadastroMedico.especialidade,
-            endereco = dadosCadastroMedico.endereco.toEndereco(),
-            ativo = true
-        )
+        val medico =
+            Medico(
+                nome = dadosCadastroMedico.nome,
+                email = dadosCadastroMedico.email,
+                telefone = dadosCadastroMedico.telefone,
+                crm = dadosCadastroMedico.crm,
+                especialidade = dadosCadastroMedico.especialidade,
+                endereco = dadosCadastroMedico.endereco.toEndereco(),
+                ativo = true,
+            )
 
         val medicoSalvo = medicoRepository.save(medico)
         log.info("Médico salvo com sucesso: {}", medicoSalvo.id)
@@ -57,13 +58,14 @@ class MedicoUseCase(
     fun atualizar(dadosAtualizacaoMedico: DadosAtualizacaoMedico): DadosDetalhamentoMedico {
         log.info("Iniciando atualização do médico com ID: {}", dadosAtualizacaoMedico.id)
 
-        val medico = medicoRepository.findById(dadosAtualizacaoMedico.id)
-            ?: throw IllegalArgumentException("Médico com ID ${dadosAtualizacaoMedico.id} não encontrado.")
+        val medico =
+            medicoRepository.findById(dadosAtualizacaoMedico.id)
+                ?: throw IllegalArgumentException("Médico com ID ${dadosAtualizacaoMedico.id} não encontrado.")
 
         medico.atualizarInformacoes(
             nome = dadosAtualizacaoMedico.nome,
             telefone = dadosAtualizacaoMedico.telefone,
-            endereco = dadosAtualizacaoMedico.endereco?.toEndereco()
+            endereco = dadosAtualizacaoMedico.endereco?.toEndereco(),
         )
 
         val medicoAtualizado = medicoRepository.save(medico)
@@ -76,8 +78,9 @@ class MedicoUseCase(
     fun excluir(id: Long) {
         log.info("Iniciando exclusão do médico com ID: {}", id)
 
-        val medico = medicoRepository.findById(id)
-            ?: throw IllegalArgumentException("Médico com ID $id não encontrado.")
+        val medico =
+            medicoRepository.findById(id)
+                ?: throw IllegalArgumentException("Médico com ID $id não encontrado.")
 
         if (!medico.ativo) {
             throw IllegalStateException("Médico com ID $id já está inativo.")
@@ -92,8 +95,9 @@ class MedicoUseCase(
     fun detalhar(id: Long): DadosDetalhamentoMedico {
         log.info("Iniciando detalhamento do médico com ID: {}", id)
 
-        val medico = medicoRepository.findById(id)
-            ?: throw IllegalArgumentException("Médico com ID $id não encontrado.")
+        val medico =
+            medicoRepository.findById(id)
+                ?: throw IllegalArgumentException("Médico com ID $id não encontrado.")
 
         if (!medico.ativo) {
             throw IllegalArgumentException("Médico com ID $id está inativo.")

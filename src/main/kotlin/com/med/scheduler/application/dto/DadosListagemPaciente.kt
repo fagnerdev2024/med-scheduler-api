@@ -5,5 +5,5 @@ data class DadosListagemPaciente(
     val nome: String,
     val email: String,
     val cpf: String,
-    val ativo: Boolean
+    val ativo: Boolean,
 )
