@@ -7,13 +7,10 @@ import java.time.LocalDateTime
 
 data class DadosAgendamentoConsulta(
     val idMedico: Long?,
-
     @field:NotNull
     val idPaciente: Long,
-
     @field:NotNull
     @field:Future
     val data: LocalDateTime,
-
-    val especialidade: Especialidade?
+    val especialidade: Especialidade?,
 )

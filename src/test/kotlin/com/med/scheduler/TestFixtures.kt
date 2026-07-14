@@ -14,7 +14,6 @@ import com.med.scheduler.domain.model.enums.MotivoCancelamento
 import java.time.LocalDateTime
 
 object TestFixtures {
-
     fun endereco(
         logradouro: String = "Rua Teste",
         bairro: String = "Bairro Teste",
@@ -22,7 +21,7 @@ object TestFixtures {
         numero: String = "100",
         complemento: String? = "Apto 1",
         cidade: String = "Cidade Teste",
-        uf: String = "SP"
+        uf: String = "SP",
     ) = Endereco(
         logradouro = logradouro,
         bairro = bairro,
@@ -30,7 +29,7 @@ object TestFixtures {
         numero = numero,
         complemento = complemento,
         cidade = cidade,
-        uf = uf
+        uf = uf,
     )
 
     fun dadosEndereco(
@@ -40,7 +39,7 @@ object TestFixtures {
         cidade: String = "Cidade Teste",
         uf: String = "SP",
         complemento: String? = "Apto 1",
-        numero: String = "100"
+        numero: String = "100",
     ) = DadosEndereco(
         logradouro = logradouro,
         bairro = bairro,
@@ -48,7 +47,7 @@ object TestFixtures {
         cidade = cidade,
         uf = uf,
         complemento = complemento,
-        numero = numero
+        numero = numero,
     )
 
     fun medico(
@@ -59,7 +58,7 @@ object TestFixtures {
         crm: String = "1234",
         especialidade: Especialidade = Especialidade.CARDIOLOGIA,
         endereco: Endereco = endereco(),
-        ativo: Boolean = true
+        ativo: Boolean = true,
     ) = Medico(
         id = id,
         nome = nome,
@@ -68,7 +67,7 @@ object TestFixtures {
         crm = crm,
         especialidade = especialidade,
         endereco = endereco,
-        ativo = ativo
+        ativo = ativo,
     )
 
     fun dadosCadastroMedico(
@@ -77,14 +76,14 @@ object TestFixtures {
         telefone: String = "11999999999",
         crm: String = "1234",
         especialidade: Especialidade = Especialidade.CARDIOLOGIA,
-        endereco: DadosEndereco = dadosEndereco()
+        endereco: DadosEndereco = dadosEndereco(),
     ) = DadosCadastroMedico(
         nome = nome,
         email = email,
         telefone = telefone,
         crm = crm,
         especialidade = especialidade,
-        endereco = endereco
+        endereco = endereco,
     )
 
     fun paciente(
@@ -94,7 +93,7 @@ object TestFixtures {
         cpf: String = "123.456.789-09",
         telefone: String = "11988888888",
         endereco: Endereco = endereco(),
-        ativo: Boolean = true
+        ativo: Boolean = true,
     ) = Paciente(
         id = id,
         nome = nome,
@@ -102,7 +101,7 @@ object TestFixtures {
         cpf = cpf,
         telefone = telefone,
         endereco = endereco,
-        ativo = ativo
+        ativo = ativo,
     )
 
     fun dadosCadastroPaciente(
@@ -110,13 +109,13 @@ object TestFixtures {
         email: String = "paciente@teste.com",
         telefone: String = "11988888888",
         cpf: String = "123.456.789-09",
-        endereco: DadosEndereco = dadosEndereco()
+        endereco: DadosEndereco = dadosEndereco(),
     ) = DadosCadastroPaciente(
         nome = nome,
         email = email,
         telefone = telefone,
         cpf = cpf,
-        endereco = endereco
+        endereco = endereco,
     )
 
     fun consulta(
@@ -124,32 +123,32 @@ object TestFixtures {
         medico: Medico = medico(),
         paciente: Paciente = paciente(),
         data: LocalDateTime = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0),
-        motivoCancelamento: MotivoCancelamento? = null
+        motivoCancelamento: MotivoCancelamento? = null,
     ) = Consulta(
         id = id,
         medico = medico,
         paciente = paciente,
         data = data,
-        motivoCancelamento = motivoCancelamento
+        motivoCancelamento = motivoCancelamento,
     )
 
     fun dadosAgendamentoConsulta(
         idMedico: Long? = 1L,
         idPaciente: Long = 1L,
         data: LocalDateTime = LocalDateTime.now().plusDays(1).withHour(10).withMinute(0),
-        especialidade: Especialidade? = null
+        especialidade: Especialidade? = null,
     ) = DadosAgendamentoConsulta(
         idMedico = idMedico,
         idPaciente = idPaciente,
         data = data,
-        especialidade = especialidade
+        especialidade = especialidade,
     )
 
     fun dadosCancelamentoConsulta(
         idConsulta: Long = 1L,
-        motivo: MotivoCancelamento = MotivoCancelamento.PACIENTE_DESISTIU
+        motivo: MotivoCancelamento = MotivoCancelamento.PACIENTE_DESISTIU,
     ) = DadosCancelamentoConsulta(
         idConsulta = idConsulta,
-        motivo = motivo
+        motivo = motivo,
     )
 }

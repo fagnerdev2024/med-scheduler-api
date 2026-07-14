@@ -11,7 +11,6 @@ import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 
 class MedicoUseCaseTest {
-
     private val medicoRepository: MedicoRepository = mock()
     private val medicoUseCase = MedicoUseCase(medicoRepository)
 
@@ -60,9 +59,10 @@ class MedicoUseCaseTest {
     fun `deve lancar excecao quando tamanho da pagina exceder o limite`() {
         val paginacao = PageRequest.of(0, 101)
 
-        val exception = assertThrows(IllegalArgumentException::class.java) {
-            medicoUseCase.listar(paginacao)
-        }
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                medicoUseCase.listar(paginacao)
+            }
 
         assertEquals("O tamanho da página não pode exceder 100 registros.", exception.message)
         verifyNoInteractions(medicoRepository)
@@ -72,12 +72,13 @@ class MedicoUseCaseTest {
     fun `deve atualizar medico existente`() {
         val medico = TestFixtures.medico()
         val medicoId = medico.id!!
-        val dadosAtualizacao = DadosAtualizacaoMedico(
-            id = medicoId,
-            nome = "Dr. Atualizado",
-            telefone = "11888888888",
-            endereco = TestFixtures.dadosEndereco(logradouro = "Rua Nova")
-        )
+        val dadosAtualizacao =
+            DadosAtualizacaoMedico(
+                id = medicoId,
+                nome = "Dr. Atualizado",
+                telefone = "11888888888",
+                endereco = TestFixtures.dadosEndereco(logradouro = "Rua Nova"),
+            )
 
         whenever(medicoRepository.findById(medicoId)).thenReturn(medico)
         whenever(medicoRepository.save(medico)).thenReturn(medico)
@@ -93,18 +94,20 @@ class MedicoUseCaseTest {
 
     @Test
     fun `deve lancar excecao ao atualizar medico inexistente`() {
-        val dadosAtualizacao = DadosAtualizacaoMedico(
-            id = 999L,
-            nome = "Dr. Inexistente",
-            telefone = null,
-            endereco = null
-        )
+        val dadosAtualizacao =
+            DadosAtualizacaoMedico(
+                id = 999L,
+                nome = "Dr. Inexistente",
+                telefone = null,
+                endereco = null,
+            )
 
         whenever(medicoRepository.findById(dadosAtualizacao.id)).thenReturn(null)
 
-        val exception = assertThrows(IllegalArgumentException::class.java) {
-            medicoUseCase.atualizar(dadosAtualizacao)
-        }
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                medicoUseCase.atualizar(dadosAtualizacao)
+            }
 
         assertEquals("Médico com ID 999 não encontrado.", exception.message)
     }
@@ -129,9 +132,10 @@ class MedicoUseCaseTest {
 
         whenever(medicoRepository.findById(medicoId)).thenReturn(medico)
 
-        val exception = assertThrows(IllegalStateException::class.java) {
-            medicoUseCase.excluir(medicoId)
-        }
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                medicoUseCase.excluir(medicoId)
+            }
 
         assertEquals("Médico com ID $medicoId já está inativo.", exception.message)
         verify(medicoRepository, never()).save(any())
@@ -157,9 +161,10 @@ class MedicoUseCaseTest {
 
         whenever(medicoRepository.findById(medicoId)).thenReturn(medico)
 
-        val exception = assertThrows(IllegalArgumentException::class.java) {
-            medicoUseCase.detalhar(medicoId)
-        }
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                medicoUseCase.detalhar(medicoId)
+            }
 
         assertEquals("Médico com ID $medicoId está inativo.", exception.message)
     }

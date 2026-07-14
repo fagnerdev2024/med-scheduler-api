@@ -10,5 +10,5 @@ data class DadosDetalhamentoMedico(
     val telefone: String,
     val especialidade: Especialidade,
     val endereco: DadosEndereco,
-    val ativo: Boolean
+    val ativo: Boolean,
 )

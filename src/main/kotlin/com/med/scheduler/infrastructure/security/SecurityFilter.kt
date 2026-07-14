@@ -15,14 +15,13 @@ import java.io.IOException
 @Component
 class SecurityFilter(
     private val tokenService: TokenService,
-    private val usuarioRepository: UsuarioRepository
+    private val usuarioRepository: UsuarioRepository,
 ) : OncePerRequestFilter() {
-
     @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        filterChain: FilterChain
+        filterChain: FilterChain,
     ) {
         val tokenJWT = recuperarToken(request)
 
@@ -31,11 +30,12 @@ class SecurityFilter(
             if (!subject.isNullOrBlank()) {
                 val usuario = usuarioRepository.findByLogin(subject)
                 if (usuario != null) {
-                    val authentication = UsernamePasswordAuthenticationToken(
-                        usuario,
-                        null,
-                        usuario.authorities
-                    )
+                    val authentication =
+                        UsernamePasswordAuthenticationToken(
+                            usuario,
+                            null,
+                            usuario.authorities,
+                        )
                     SecurityContextHolder.getContext().authentication = authentication
                 }
             }

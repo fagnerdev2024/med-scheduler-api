@@ -14,9 +14,8 @@ import java.time.ZoneId
 @Service
 class TokenService(
     @Value("\${api.security.token.secret}")
-    private val secret: String
+    private val secret: String,
 ) : TokenService {
-
     companion object {
         private const val ISSUER = "API Med Scheduler"
     }

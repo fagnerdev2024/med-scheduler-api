@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class MedSchedulerApplication
 
 fun main(args: Array<String>) {
-	runApplication<MedSchedulerApplication>(*args)
+    runApplication<MedSchedulerApplication>(*args)
 }

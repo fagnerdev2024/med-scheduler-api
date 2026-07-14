@@ -10,22 +10,17 @@ import jakarta.validation.constraints.Pattern
 data class DadosCadastroMedico(
     @field:NotBlank
     val nome: String,
-
     @field:NotBlank
     @field:Email
     val email: String,
-
     @field:NotBlank
     val telefone: String,
-
     @field:NotBlank
     @field:Pattern(regexp = "\\d{4,6}")
     val crm: String,
-
     @field:NotNull
     val especialidade: Especialidade,
-
     @field:NotNull
     @field:Valid
-    val endereco: DadosEndereco
+    val endereco: DadosEndereco,
 )
