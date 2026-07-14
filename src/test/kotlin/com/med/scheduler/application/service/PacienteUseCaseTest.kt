@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 
@@ -92,6 +93,28 @@ class PacienteUseCaseTest {
     }
 
     @Test
+    fun `deve atualizar paciente mantendo endereco`() {
+        val paciente = TestFixtures.paciente()
+        val pacienteId = paciente.id!!
+        val enderecoOriginal = paciente.endereco
+        val dadosAtualizacao =
+            DadosAtualizacaoPaciente(
+                id = pacienteId,
+                nome = "Paciente Atualizado",
+                telefone = "11888888888",
+                endereco = null,
+            )
+
+        whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
+        whenever(pacienteRepository.save(paciente)).thenReturn(paciente)
+
+        val resultado = pacienteUseCase.atualizar(dadosAtualizacao)
+
+        assertEquals("Paciente Atualizado", resultado.nome)
+        assertEquals(enderecoOriginal.logradouro, resultado.endereco.logradouro)
+    }
+
+    @Test
     fun `deve lancar excecao ao atualizar paciente inexistente`() {
         val dadosAtualizacao =
             DadosAtualizacaoPaciente(
@@ -166,5 +189,41 @@ class PacienteUseCaseTest {
             }
 
         assertEquals("Paciente com ID $pacienteId está inativo.", exception.message)
+    }
+
+    @Test
+    fun `deve retornar pagina vazia ao listar sem registros`() {
+        val paginacao = PageRequest.of(0, 10)
+
+        whenever(pacienteRepository.findAllByAtivoTrue(paginacao)).thenReturn(Page.empty())
+
+        val resultado = pacienteUseCase.listar(paginacao)
+
+        assertTrue(resultado.isEmpty)
+        verify(pacienteRepository).findAllByAtivoTrue(paginacao)
+    }
+
+    @Test
+    fun `deve lancar excecao ao excluir paciente inexistente`() {
+        whenever(pacienteRepository.findById(999L)).thenReturn(null)
+
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                pacienteUseCase.excluir(999L)
+            }
+
+        assertEquals("Paciente com ID 999 não encontrado.", exception.message)
+    }
+
+    @Test
+    fun `deve lancar excecao ao detalhar paciente inexistente`() {
+        whenever(pacienteRepository.findById(999L)).thenReturn(null)
+
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                pacienteUseCase.detalhar(999L)
+            }
+
+        assertEquals("Paciente com ID 999 não encontrado.", exception.message)
     }
 }
