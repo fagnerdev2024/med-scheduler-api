@@ -15,7 +15,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
 
 jobs:
   build-and-test:
@@ -100,7 +99,3 @@ jobs:
         with:
           name: dependency-check-report
           path: build/reports/dependency-check-report.*
-
-      - name: Dependency Review
-        if: github.event_name == 'pull_request'
-        uses: actions/dependency-review-action@v4
