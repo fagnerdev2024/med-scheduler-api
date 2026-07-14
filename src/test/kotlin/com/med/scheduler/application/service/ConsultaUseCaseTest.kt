@@ -391,4 +391,149 @@ class ConsultaUseCaseTest {
         )
         verify(consultaRepository, never()).save(any<Consulta>())
     }
+
+    @Test
+    fun `deve lancar excecao quando horario de agendamento for antes das 7h`() {
+        val data = dataFutura(hora = 6)
+        val dadosAgendamento = TestFixtures.dadosAgendamentoConsulta(data = data)
+
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                consultaUseCase.agendar(dadosAgendamento)
+            }
+
+        assertEquals(
+            "Consulta fora do horário de funcionamento da clínica (Seg-Sáb, 07:00 às 18:00).",
+            exception.message,
+        )
+    }
+
+    @Test
+    fun `deve permitir agendamento as 7h`() {
+        val data = dataFutura(hora = 7)
+        val medico = TestFixtures.medico()
+        val medicoId = medico.id!!
+        val paciente = TestFixtures.paciente()
+        val pacienteId = paciente.id!!
+        val dadosAgendamento =
+            TestFixtures.dadosAgendamentoConsulta(
+                idMedico = medicoId,
+                idPaciente = pacienteId,
+                data = data,
+            )
+        val consultaEsperada = TestFixtures.consulta(data = data, medico = medico, paciente = paciente)
+
+        whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
+        whenever(medicoRepository.findById(medicoId)).thenReturn(medico)
+        whenever(
+            consultaRepository.existsByMedicoIdAndDataAndMotivoCancelamentoIsNull(medicoId, data),
+        ).thenReturn(false)
+        whenever(
+            consultaRepository.existsByPacienteIdAndDataBetweenAndMotivoCancelamentoIsNull(
+                pacienteId,
+                data.withHour(7),
+                data.withHour(18),
+            ),
+        ).thenReturn(false)
+        whenever(consultaRepository.save(any())).thenReturn(consultaEsperada)
+
+        val resultado = consultaUseCase.agendar(dadosAgendamento)
+
+        assertEquals(medicoId, resultado.idMedico)
+        assertEquals(pacienteId, resultado.idPaciente)
+    }
+
+    @Test
+    fun `deve lancar excecao quando especialidade nao for informada com medico aleatorio`() {
+        val data = dataFutura()
+        val paciente = TestFixtures.paciente()
+        val pacienteId = paciente.id!!
+        val dadosAgendamento =
+            TestFixtures.dadosAgendamentoConsulta(
+                idMedico = null,
+                idPaciente = pacienteId,
+                data = data,
+                especialidade = null,
+            )
+
+        whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
+
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                consultaUseCase.agendar(dadosAgendamento)
+            }
+
+        assertEquals("Especialidade é obrigatória quando médico não for escolhido.", exception.message)
+    }
+
+    @Test
+    fun `deve lancar excecao quando nao houver medico disponivel para especialidade e data`() {
+        val data = dataFutura()
+        val paciente = TestFixtures.paciente()
+        val pacienteId = paciente.id!!
+        val especialidade = Especialidade.CARDIOLOGIA
+        val dadosAgendamento =
+            TestFixtures.dadosAgendamentoConsulta(
+                idMedico = null,
+                idPaciente = pacienteId,
+                data = data,
+                especialidade = especialidade,
+            )
+
+        whenever(pacienteRepository.findById(pacienteId)).thenReturn(paciente)
+        whenever(
+            medicoRepository.escolherMedicoAleatorioLivreNaData(especialidade, data),
+        ).thenReturn(null)
+
+        val exception =
+            assertThrows(IllegalStateException::class.java) {
+                consultaUseCase.agendar(dadosAgendamento)
+            }
+
+        assertEquals(
+            "Nenhum médico disponível para a especialidade e data informados.",
+            exception.message,
+        )
+    }
+
+    @Test
+    fun `deve lancar excecao quando paciente nao for encontrado`() {
+        val data = dataFutura()
+        val dadosAgendamento = TestFixtures.dadosAgendamentoConsulta(data = data)
+
+        whenever(pacienteRepository.findById(dadosAgendamento.idPaciente)).thenReturn(null)
+
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                consultaUseCase.agendar(dadosAgendamento)
+            }
+
+        assertEquals("Paciente não encontrado.", exception.message)
+    }
+
+    @Test
+    fun `deve lancar excecao ao detalhar consulta inexistente`() {
+        whenever(consultaRepository.findById(999L)).thenReturn(null)
+
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                consultaUseCase.detalhar(999L)
+            }
+
+        assertEquals("Consulta não encontrada.", exception.message)
+    }
+
+    @Test
+    fun `deve lancar excecao ao cancelar consulta inexistente`() {
+        val dadosCancelamento = TestFixtures.dadosCancelamentoConsulta(idConsulta = 999L)
+
+        whenever(consultaRepository.findById(999L)).thenReturn(null)
+
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                consultaUseCase.cancelar(dadosCancelamento)
+            }
+
+        assertEquals("Consulta não encontrada.", exception.message)
+    }
 }
