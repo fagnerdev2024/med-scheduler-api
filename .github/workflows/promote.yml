@@ -6,6 +6,7 @@ on:
       - 'feature/**'
       - develop
       - 'release/**'
+      - main
 
 permissions:
   contents: write
@@ -138,6 +139,17 @@ jobs:
             create_pr "main" "$release_branch" \
               "PR criado automaticamente. main <- $release_branch" \
               "PR automático para promover alterações de $release_branch para main (produção)."
+            exit 0
+          fi
+
+          # main -> sync develop to main
+          if [ "$CURRENT_BRANCH" = "main" ]; then
+            if git merge-base --is-ancestor origin/develop origin/main; then
+              echo "Syncing develop to main..."
+              git push origin main:develop
+            else
+              echo "develop is not an ancestor of main. Cannot fast-forward."
+            fi
             exit 0
           fi
 
