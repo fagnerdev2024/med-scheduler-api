@@ -7,7 +7,6 @@ data class DadosAutenticacao(
     @field:NotBlank
     @field:Email
     val login: String,
-
     @field:NotBlank
-    val senha: String
+    val senha: String,
 )

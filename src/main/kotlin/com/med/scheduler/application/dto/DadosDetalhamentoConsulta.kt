@@ -8,5 +8,5 @@ data class DadosDetalhamentoConsulta(
     val idMedico: Long?,
     val idPaciente: Long?,
     val data: LocalDateTime,
-    val motivoCancelamento: MotivoCancelamento?
+    val motivoCancelamento: MotivoCancelamento?,
 )

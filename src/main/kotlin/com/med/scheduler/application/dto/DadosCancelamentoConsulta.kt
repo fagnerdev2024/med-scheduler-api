@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotNull
 data class DadosCancelamentoConsulta(
     @field:NotNull
     val idConsulta: Long,
-
     @field:NotNull
-    val motivo: MotivoCancelamento
+    val motivo: MotivoCancelamento,
 )

@@ -11,12 +11,9 @@ class Usuario(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-
     var login: String,
-
-    var senha: String
+    var senha: String,
 ) : UserDetails {
-
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return listOf(SimpleGrantedAuthority("ROLE_USER"))
     }

@@ -11,13 +11,14 @@ import org.springframework.stereotype.Service
 @Service
 class AutenticacaoUseCase(
     private val authenticationManager: AuthenticationManager,
-    private val tokenService: TokenService
+    private val tokenService: TokenService,
 ) {
     fun autenticar(dadosAutenticacao: DadosAutenticacao): DadosTokenJWT {
-        val authenticationToken = UsernamePasswordAuthenticationToken(
-            dadosAutenticacao.login,
-            dadosAutenticacao.senha
-        )
+        val authenticationToken =
+            UsernamePasswordAuthenticationToken(
+                dadosAutenticacao.login,
+                dadosAutenticacao.senha,
+            )
 
         val authentication = authenticationManager.authenticate(authenticationToken)
         val tokenJWT = tokenService.gerarToken(authentication.principal as UserDetails)

@@ -1,7 +1,7 @@
 package com.med.scheduler.domain.model
 
-import jakarta.persistence.*
 import com.med.scheduler.domain.model.enums.MotivoCancelamento
+import jakarta.persistence.*
 import java.time.LocalDateTime
 
 @Table(name = "consultas")
@@ -10,20 +10,16 @@ class Consulta(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "medico_id")
     var medico: Medico,
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paciente_id")
     var paciente: Paciente,
-
     var data: LocalDateTime,
-
     @Column(name = "motivo_cancelamento")
     @Enumerated(EnumType.STRING)
-    var motivoCancelamento: MotivoCancelamento? = null
+    var motivoCancelamento: MotivoCancelamento? = null,
 ) {
     fun cancelar(motivoCancelamento: MotivoCancelamento) {
         this.motivoCancelamento = motivoCancelamento

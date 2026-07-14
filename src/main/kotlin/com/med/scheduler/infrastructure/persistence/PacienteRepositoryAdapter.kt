@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class PacienteRepositoryAdapter(
-    private val jpaRepository: PacienteJpaRepository
+    private val jpaRepository: PacienteJpaRepository,
 ) : PacienteRepository {
     override fun save(paciente: Paciente): Paciente {
         return jpaRepository.save(paciente)

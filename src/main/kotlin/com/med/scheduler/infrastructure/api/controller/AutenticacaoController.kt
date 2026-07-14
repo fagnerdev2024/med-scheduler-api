@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/login")
 class AutenticacaoController(
-    private val autenticacaoUseCase: AutenticacaoUseCase
+    private val autenticacaoUseCase: AutenticacaoUseCase,
 ) {
     private val log = LoggerFactory.getLogger(AutenticacaoController::class.java)
 
     @PostMapping
-    fun efetuarLogin(@RequestBody @Valid dados: DadosAutenticacao): ResponseEntity<DadosTokenJWT> {
+    fun efetuarLogin(
+        @RequestBody @Valid dados: DadosAutenticacao,
+    ): ResponseEntity<DadosTokenJWT> {
         log.info("Tentativa de autenticação do usuário: {}", dados.login)
         val token = autenticacaoUseCase.autenticar(dados)
         log.info("Autenticação bem-sucedida para o usuário: {}", dados.login)
