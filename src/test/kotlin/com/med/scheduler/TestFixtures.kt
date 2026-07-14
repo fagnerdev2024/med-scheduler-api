@@ -151,4 +151,28 @@ object TestFixtures {
         idConsulta = idConsulta,
         motivo = motivo,
     )
+
+    fun dadosAtualizacaoMedico(
+        id: Long = 1L,
+        nome: String? = "Dr. Atualizado",
+        telefone: String? = "11888888888",
+        endereco: DadosEndereco = dadosEndereco(logradouro = "Rua Nova"),
+    ) = com.med.scheduler.application.dto.DadosAtualizacaoMedico(
+        id = id,
+        nome = nome,
+        telefone = telefone,
+        endereco = endereco,
+    )
+
+    fun dadosAtualizacaoPaciente(
+        id: Long = 1L,
+        nome: String? = "Paciente Atualizado",
+        telefone: String? = "11888888888",
+        endereco: DadosEndereco = dadosEndereco(logradouro = "Rua Nova"),
+    ) = com.med.scheduler.application.dto.DadosAtualizacaoPaciente(
+        id = id,
+        nome = nome,
+        telefone = telefone,
+        endereco = endereco,
+    )
 }
