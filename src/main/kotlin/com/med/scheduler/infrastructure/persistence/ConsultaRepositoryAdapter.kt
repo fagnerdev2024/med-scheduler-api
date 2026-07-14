@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 @Component
 class ConsultaRepositoryAdapter(
-    private val jpaRepository: ConsultaJpaRepository
+    private val jpaRepository: ConsultaJpaRepository,
 ) : ConsultaRepository {
     override fun save(consulta: Consulta): Consulta {
         return jpaRepository.save(consulta)
@@ -26,16 +26,18 @@ class ConsultaRepositoryAdapter(
     override fun existsByPacienteIdAndDataBetweenAndMotivoCancelamentoIsNull(
         pacienteId: Long,
         inicio: LocalDateTime,
-        fim: LocalDateTime
+        fim: LocalDateTime,
     ): Boolean {
         return jpaRepository.existsByPacienteIdAndDataBetweenAndMotivoCancelamentoIsNull(
-            pacienteId, inicio, fim
+            pacienteId,
+            inicio,
+            fim,
         )
     }
 
     override fun existsByMedicoIdAndDataAndMotivoCancelamentoIsNull(
         medicoId: Long,
-        data: LocalDateTime
+        data: LocalDateTime,
     ): Boolean {
         return jpaRepository.existsByMedicoIdAndDataAndMotivoCancelamentoIsNull(medicoId, data)
     }

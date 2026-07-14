@@ -4,6 +4,9 @@ plugins {
     kotlin("plugin.jpa") version "2.0.21"
     id("org.springframework.boot") version "3.4.0"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
+    jacoco
+    id("org.owasp.dependencycheck") version "10.0.3"
 }
 
 group = "com.med.scheduler"
@@ -70,4 +73,27 @@ allOpen {
 tasks.withType<Test> {
     useJUnitPlatform()
     jvmArgs("-XX:+EnableDynamicAgentLoading")
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    dependsOn(tasks.test)
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 11f
+    analyzers.assemblyEnabled = false
+    analyzers.nodeEnabled = false
+    format = "ALL"
+    nvd.apiKey = System.getenv("NVD_API_KEY") ?: ""
+}
+
+ktlint {
+    filter {
+        exclude("**/generated/**")
+    }
 }

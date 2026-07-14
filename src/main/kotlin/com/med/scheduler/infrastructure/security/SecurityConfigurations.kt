@@ -18,9 +18,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @Configuration
 @EnableWebSecurity
 class SecurityConfigurations(
-    private val securityFilter: SecurityFilter
+    private val securityFilter: SecurityFilter,
 ) {
-
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         return http
@@ -39,12 +38,13 @@ class SecurityConfigurations(
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
-        val configuration = CorsConfiguration().apply {
-            allowedOriginPatterns = listOf("*")
-            allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
-            allowedHeaders = listOf("*")
-            allowCredentials = true
-        }
+        val configuration =
+            CorsConfiguration().apply {
+                allowedOriginPatterns = listOf("*")
+                allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
+                allowedHeaders = listOf("*")
+                allowCredentials = true
+            }
         return UrlBasedCorsConfigurationSource().apply {
             registerCorsConfiguration("/**", configuration)
         }

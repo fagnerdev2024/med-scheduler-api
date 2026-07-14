@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @RestControllerAdvice
 class TratadorDeErros {
-
     private val log = LoggerFactory.getLogger(TratadorDeErros::class.java)
 
     @ExceptionHandler(EntityNotFoundException::class)
@@ -35,7 +34,7 @@ class TratadorDeErros {
     private fun FieldError.toMap(): Map<String, String> {
         return mapOf(
             "campo" to field,
-            "mensagem" to (defaultMessage ?: "")
+            "mensagem" to (defaultMessage ?: ""),
         )
     }
 
