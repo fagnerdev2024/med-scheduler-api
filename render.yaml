@@ -21,7 +21,7 @@ services:
   - type: web
     runtime: docker
     name: med-scheduler-api-homol
-    branch: release/v0.3.0
+    branch: release/v0.4.0
     plan: starter
     dockerfilePath: ./Dockerfile
     healthCheckPath: /actuator/health
