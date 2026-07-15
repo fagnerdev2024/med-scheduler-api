@@ -8,8 +8,8 @@ import com.med.scheduler.domain.service.TokenService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
-import java.time.ZoneId
+import java.time.Instant
+import java.time.temporal.ChronoUnit
 
 @Service
 class TokenService(
@@ -26,7 +26,7 @@ class TokenService(
             return JWT.create()
                 .withIssuer(ISSUER)
                 .withSubject(userDetails.username)
-                .withExpiresAt(LocalDateTime.now().plusHours(2).atZone(ZoneId.of("UTC")).toInstant())
+                .withExpiresAt(Instant.now().plus(2, ChronoUnit.HOURS))
                 .sign(algorithm)
         } catch (exception: JWTCreationException) {
             throw RuntimeException("Erro ao gerar token JWT", exception)
