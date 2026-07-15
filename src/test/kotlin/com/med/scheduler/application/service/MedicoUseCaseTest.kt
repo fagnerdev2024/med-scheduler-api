@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 
@@ -93,6 +94,28 @@ class MedicoUseCaseTest {
     }
 
     @Test
+    fun `deve atualizar medico mantendo endereco`() {
+        val medico = TestFixtures.medico()
+        val medicoId = medico.id!!
+        val enderecoOriginal = medico.endereco
+        val dadosAtualizacao =
+            DadosAtualizacaoMedico(
+                id = medicoId,
+                nome = "Dr. Atualizado",
+                telefone = "11888888888",
+                endereco = null,
+            )
+
+        whenever(medicoRepository.findById(medicoId)).thenReturn(medico)
+        whenever(medicoRepository.save(medico)).thenReturn(medico)
+
+        val resultado = medicoUseCase.atualizar(dadosAtualizacao)
+
+        assertEquals("Dr. Atualizado", resultado.nome)
+        assertEquals(enderecoOriginal.logradouro, resultado.endereco.logradouro)
+    }
+
+    @Test
     fun `deve lancar excecao ao atualizar medico inexistente`() {
         val dadosAtualizacao =
             DadosAtualizacaoMedico(
@@ -167,5 +190,41 @@ class MedicoUseCaseTest {
             }
 
         assertEquals("Médico com ID $medicoId está inativo.", exception.message)
+    }
+
+    @Test
+    fun `deve retornar pagina vazia ao listar sem registros`() {
+        val paginacao = PageRequest.of(0, 10)
+
+        whenever(medicoRepository.findAllByAtivoTrue(paginacao)).thenReturn(Page.empty())
+
+        val resultado = medicoUseCase.listar(paginacao)
+
+        assertTrue(resultado.isEmpty)
+        verify(medicoRepository).findAllByAtivoTrue(paginacao)
+    }
+
+    @Test
+    fun `deve lancar excecao ao excluir medico inexistente`() {
+        whenever(medicoRepository.findById(999L)).thenReturn(null)
+
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                medicoUseCase.excluir(999L)
+            }
+
+        assertEquals("Médico com ID 999 não encontrado.", exception.message)
+    }
+
+    @Test
+    fun `deve lancar excecao ao detalhar medico inexistente`() {
+        whenever(medicoRepository.findById(999L)).thenReturn(null)
+
+        val exception =
+            assertThrows(IllegalArgumentException::class.java) {
+                medicoUseCase.detalhar(999L)
+            }
+
+        assertEquals("Médico com ID 999 não encontrado.", exception.message)
     }
 }
