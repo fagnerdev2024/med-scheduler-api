@@ -1,8 +1,9 @@
 package com.med.scheduler.infrastructure.api.controller
 
-import com.med.scheduler.application.dto.DadosAtualizacaoPaciente
+import com.med.scheduler.application.dto.DadosAtualizacaoPacienteRequest
 import com.med.scheduler.application.dto.DadosCadastroPaciente
 import com.med.scheduler.application.dto.DadosDetalhamentoPaciente
+import com.med.scheduler.application.dto.toUseCase
 import com.med.scheduler.application.service.PacienteUseCase
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
@@ -49,12 +50,13 @@ class PacienteController(
         }
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     fun atualizar(
-        @RequestBody @Valid dados: DadosAtualizacaoPaciente,
+        @PathVariable id: Long,
+        @RequestBody @Valid dados: DadosAtualizacaoPacienteRequest,
     ): ResponseEntity<DadosDetalhamentoPaciente> {
-        log.info("Recebida solicitação para atualizar paciente com ID: {}", dados.id)
-        return ResponseEntity.ok(pacienteUseCase.atualizar(dados))
+        log.info("Recebida solicitação para atualizar paciente com ID: {}", id)
+        return ResponseEntity.ok(pacienteUseCase.atualizar(dados.toUseCase(id)))
     }
 
     @DeleteMapping("/{id}")
