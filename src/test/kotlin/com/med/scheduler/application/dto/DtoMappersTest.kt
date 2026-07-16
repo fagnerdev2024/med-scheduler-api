@@ -94,6 +94,32 @@ class DtoMappersTest {
     }
 
     @Test
+    fun `deve converter DadosAtualizacaoMedicoRequest para DadosAtualizacaoMedico`() {
+        val request = TestFixtures.dadosAtualizacaoMedicoRequest()
+        val id = 2L
+
+        val dto = request.toUseCase(id)
+
+        assertEquals(id, dto.id)
+        assertEquals(request.nome, dto.nome)
+        assertEquals(request.telefone, dto.telefone)
+        assertEquals(request.endereco, dto.endereco)
+    }
+
+    @Test
+    fun `deve converter DadosAtualizacaoPacienteRequest para DadosAtualizacaoPaciente`() {
+        val request = TestFixtures.dadosAtualizacaoPacienteRequest()
+        val id = 3L
+
+        val dto = request.toUseCase(id)
+
+        assertEquals(id, dto.id)
+        assertEquals(request.nome, dto.nome)
+        assertEquals(request.telefone, dto.telefone)
+        assertEquals(request.endereco, dto.endereco)
+    }
+
+    @Test
     fun `deve converter Consulta para DadosDetalhamentoConsulta`() {
         val consulta = TestFixtures.consulta()
 

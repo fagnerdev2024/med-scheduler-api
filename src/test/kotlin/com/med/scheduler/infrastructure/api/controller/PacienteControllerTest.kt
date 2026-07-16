@@ -64,12 +64,14 @@ class PacienteControllerTest {
 
     @Test
     fun `deve atualizar paciente e retornar 200`() {
-        val dados = TestFixtures.dadosAtualizacaoPaciente()
+        val id = 1L
+        val request = TestFixtures.dadosAtualizacaoPacienteRequest()
+        val dados = request.toUseCase(id)
         val detalhamento = TestFixtures.paciente().toDetalhamentoDTO()
 
         whenever(pacienteUseCase.atualizar(dados)).thenReturn(detalhamento)
 
-        val response = controller.atualizar(dados)
+        val response = controller.atualizar(id, request)
 
         assertEquals(HttpStatus.OK, response.statusCode)
         assertEquals(detalhamento, response.body)
