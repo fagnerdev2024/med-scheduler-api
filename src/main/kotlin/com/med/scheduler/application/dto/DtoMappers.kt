@@ -16,6 +16,22 @@ fun DadosEndereco.toEndereco() =
         uf = this.uf,
     )
 
+fun DadosAtualizacaoMedicoRequest.toUseCase(id: Long) =
+    DadosAtualizacaoMedico(
+        id = id,
+        nome = this.nome,
+        telefone = this.telefone,
+        endereco = this.endereco,
+    )
+
+fun DadosAtualizacaoPacienteRequest.toUseCase(id: Long) =
+    DadosAtualizacaoPaciente(
+        id = id,
+        nome = this.nome,
+        telefone = this.telefone,
+        endereco = this.endereco,
+    )
+
 fun Endereco.toDadosEndereco() =
     DadosEndereco(
         logradouro = this.logradouro,
