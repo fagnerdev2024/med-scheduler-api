@@ -1,0 +1,49 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+  }
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 48px;
+}
+
+form {
+  padding: 16px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+
+  .flex-grow {
+    flex: 1 1 240px;
+  }
+
+  .flex-grow-3 {
+    flex: 3 1 300px;
+  }
+
+  .flex-grow-1 {
+    flex: 1 1 120px;
+  }
+}
+
+.uf-field {
+  width: 80px;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+}

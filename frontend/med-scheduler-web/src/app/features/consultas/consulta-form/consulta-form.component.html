@@ -1,0 +1,62 @@
+<div class="page-header">
+  <h1>Nova Consulta</h1>
+  <button mat-stroked-button routerLink="/consultas">Voltar</button>
+</div>
+
+@if (loading) {
+  <div class="loading"><mat-spinner diameter="48"></mat-spinner></div>
+} @else {
+  <mat-card>
+    <form [formGroup]="consultaForm" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="flex-grow">
+          <mat-label>Paciente</mat-label>
+          <mat-select formControlName="idPaciente">
+            @for (paciente of pacientes; track paciente.id) {
+              <mat-option [value]="paciente.id">{{ paciente.nome }} ({{ paciente.cpf }})</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="flex-grow">
+          <mat-label>Médico (opcional)</mat-label>
+          <mat-select formControlName="idMedico">
+            <mat-option [value]="null">-- Escolher pelo sistema --</mat-option>
+            @for (medico of medicos; track medico.id) {
+              <mat-option [value]="medico.id">{{ medico.nome }} - {{ medico.especialidade }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="flex-grow">
+          <mat-label>Data e hora</mat-label>
+          <input matInput formControlName="data" type="datetime-local" />
+          <mat-hint>Ex: 2026-08-10T09:00</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="flex-grow">
+          <mat-label>Especialidade (opcional)</mat-label>
+          <mat-select formControlName="especialidade">
+            <mat-option [value]="''">-- Nenhuma --</mat-option>
+            @for (esp of especialidades; track esp.valor) {
+              <mat-option [value]="esp.valor">{{ esp.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="salvando">
+          @if (salvando) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            Agendar
+          }
+        </button>
+        <button mat-stroked-button type="button" routerLink="/consultas" [disabled]="salvando">Cancelar</button>
+      </div>
+    </form>
+  </mat-card>
+}

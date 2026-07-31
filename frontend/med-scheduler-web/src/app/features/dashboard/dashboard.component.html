@@ -1,0 +1,54 @@
+<div class="dashboard-header">
+  <h1>Dashboard</h1>
+  <p>Bem-vindo ao Med Scheduler</p>
+</div>
+
+@if (loading) {
+  <div class="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+} @else {
+  <mat-grid-list cols="3" rowHeight="160px" gutterSize="16px" class="cards-grid">
+    <mat-grid-tile>
+      <mat-card class="stat-card" routerLink="/medicos">
+        <mat-card-content>
+          <mat-icon class="stat-icon" color="primary">medical_services</mat-icon>
+          <div class="stat-value">{{ totalMedicos }}</div>
+          <div class="stat-label">Médicos</div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile>
+      <mat-card class="stat-card" routerLink="/pacientes">
+        <mat-card-content>
+          <mat-icon class="stat-icon" color="accent">people</mat-icon>
+          <div class="stat-value">{{ totalPacientes }}</div>
+          <div class="stat-label">Pacientes</div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+
+    <mat-grid-tile>
+      <mat-card class="stat-card" routerLink="/consultas">
+        <mat-card-content>
+          <mat-icon class="stat-icon" color="warn">event</mat-icon>
+          <div class="stat-value">{{ totalConsultas }}</div>
+          <div class="stat-label">Consultas</div>
+        </mat-card-content>
+      </mat-card>
+    </mat-grid-tile>
+  </mat-grid-list>
+
+  <div class="actions">
+    <button mat-raised-button color="primary" routerLink="/medicos/novo">
+      <mat-icon>add</mat-icon> Novo médico
+    </button>
+    <button mat-raised-button color="primary" routerLink="/pacientes/novo">
+      <mat-icon>add</mat-icon> Novo paciente
+    </button>
+    <button mat-raised-button color="primary" routerLink="/consultas/novo">
+      <mat-icon>add</mat-icon> Nova consulta
+    </button>
+  </div>
+}
