@@ -1,0 +1,17 @@
+<h2 mat-dialog-title>Cancelar consulta</h2>
+<mat-dialog-content>
+  <p>Selecione o motivo do cancelamento da consulta do dia {{ data.data | date:'dd/MM/yyyy HH:mm' }}.</p>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Motivo</mat-label>
+    <mat-select [formControl]="motivo">
+      @for (m of motivos; track m.valor) {
+        <mat-option [value]="m.valor">{{ m.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancelar()">Cancelar</button>
+  <button mat-raised-button color="warn" (click)="confirmar()" [disabled]="motivo.invalid">Confirmar</button>
+</mat-dialog-actions>
