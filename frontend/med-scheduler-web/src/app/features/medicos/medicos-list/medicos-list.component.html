@@ -1,0 +1,61 @@
+<div class="page-header">
+  <h1>Médicos</h1>
+  <button mat-raised-button color="primary" routerLink="/medicos/novo">
+    <mat-icon>add</mat-icon> Novo médico
+  </button>
+</div>
+
+<mat-form-field appearance="outline" class="filter-field">
+  <mat-label>Buscar</mat-label>
+  <input matInput [formControl]="filtro" placeholder="Nome, email, CRM ou especialidade" />
+</mat-form-field>
+
+@if (loading) {
+  <div class="loading"><mat-spinner diameter="40"></mat-spinner></div>
+} @else {
+  <mat-card>
+    <table mat-table [dataSource]="dataSource" class="full-width">
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let medico">{{ medico.nome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>Email</th>
+        <td mat-cell *matCellDef="let medico">{{ medico.email }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="crm">
+        <th mat-header-cell *matHeaderCellDef>CRM</th>
+        <td mat-cell *matCellDef="let medico">{{ medico.crm }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="especialidade">
+        <th mat-header-cell *matHeaderCellDef>Especialidade</th>
+        <td mat-cell *matCellDef="let medico">{{ medico.especialidade }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef class="actions-column">Ações</th>
+        <td mat-cell *matCellDef="let medico" class="actions-column">
+          <button mat-icon-button color="primary" [routerLink]="['/medicos', medico.id, 'editar']" title="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="excluir(medico.id)" title="Excluir">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    <mat-paginator [length]="page?.totalElements || 0"
+                   [pageIndex]="pageIndex"
+                   [pageSize]="pageSize"
+                   [pageSizeOptions]="[5, 10, 25, 50]"
+                   (page)="onPageChange($event)">
+    </mat-paginator>
+  </mat-card>
+}
