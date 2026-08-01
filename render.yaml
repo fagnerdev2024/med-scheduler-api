@@ -4,8 +4,11 @@ services:
     name: med-scheduler-web-prod
     branch: main
     plan: starter
-    buildCommand: npm --prefix frontend/med-scheduler-web install && npm --prefix frontend/med-scheduler-web run build -- --configuration production
+    buildCommand: npm --prefix frontend/med-scheduler-web ci && npm --prefix frontend/med-scheduler-web run build -- --configuration production
     staticPublishPath: ./frontend/med-scheduler-web/dist/med-scheduler-web/browser
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
     routes:
       - type: rewrite
         source: /*
@@ -16,8 +19,11 @@ services:
     name: med-scheduler-web-dev
     branch: develop
     plan: starter
-    buildCommand: npm --prefix frontend/med-scheduler-web install && npm --prefix frontend/med-scheduler-web run build -- --configuration development
+    buildCommand: npm --prefix frontend/med-scheduler-web ci && npm --prefix frontend/med-scheduler-web run build -- --configuration development
     staticPublishPath: ./frontend/med-scheduler-web/dist/med-scheduler-web/browser
+    envVars:
+      - key: NODE_VERSION
+        value: 20.18.0
     routes:
       - type: rewrite
         source: /*
@@ -45,7 +51,7 @@ services:
   - type: web
     runtime: docker
     name: med-scheduler-api-homol
-    branch: release/v0.9.0
+    branch: release/v0.10.0
     plan: starter
     dockerfilePath: ./Dockerfile
     healthCheckPath: /actuator/health
