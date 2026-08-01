@@ -1,0 +1,35 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  padding: 32px;
+}
+
+.actions-column {
+  width: 100px;
+  text-align: center;
+}
+
+.status-agendado {
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.status-cancelado {
+  color: #c62828;
+  font-weight: 500;
+}
